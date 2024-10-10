@@ -1,9 +1,20 @@
-import React from 'react'
+import React from "react";
+import Button from "./components/Button/Button";
 
 const App = () => {
-  return (
-    <div>App</div>
-  )
-}
+  const makeApiCall = () => {
+    alert("Test");
+  };
 
-export default App
+  return (
+    <Button
+      as="a"
+      title="Click Here"
+      variant="primary"
+      rootComponent="app"
+      clickFunction={makeApiCall}
+    />
+  );
+};
+
+export default App;
