@@ -1,63 +1,66 @@
 import axios from "axios";
-import { toast } from "react-hot-toast";
 
+const refreshToken = async () => {
+  try {
+    await axiosInstance.get("/refresh_token")
+  } catch (err) {
+    console.log(err)
+  }
+
+};
 
 const axiosInstance = axios.create({
-  baseURL: "https://your-api-url.com", 
-  timeout: 10000, 
+  baseURL: process.env.REACT_APP_API_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  }
 });
 
 
-axiosInstance.interceptors.request.use(
-    (config) => {      
-      const token = localStorage.getItem('token'); 
-      if (token) {
-        config.headers['Authorization'] = `Bearer ${token}`; 
-      }
-      return config;
-    },
-    (error) => {
-     
-      return Promise.reject(error);
-    }
-  );
+axiosInstance.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  async (error) => {
+    try {
+      const originalRequest = error.config;
+      if (error.response.status === 401 && !originalRequest._retry) {
+        originalRequest._retry = true;
 
-
-  axiosInstance.interceptors.response.use(
-    (response) => {
-      toast.success(response.data.message);
-      return response.data; 
-    },
-    async (error) => {
-      if (error.response) {        
-        console.error('Response error:', error.response.data);
-        toast.error(error.response.data.message || "An error occurred!");
-        
-        if (error.response.status === 401) {
-          try {
-            const refreshToken = localStorage.getItem('token');
-            const response = await axios.post('/refresh-token', { token: refreshToken });
-            const newToken = response.data.token;
-          
-            localStorage.setItem('token', newToken);
-                        
-            error.config.headers['Authorization'] = `Bearer ${newToken}`;
-            return axiosInstance(error.config);
-          } catch (refreshError) {
-            console.error('Refresh token error:', refreshError);
-            toast.error("Session expired, please log in again.");
-            // Optionally redirect to login
-          }
+        if (error.response.data.message === "JSON web token is expired. try again") {
+          await refreshToken();
+          return axiosInstance(originalRequest);
         }
-      } else if (error.request) {
-        console.error('Request error:', error.request);
-        toast.error("No response received from the server.");
-      } else {
-        console.error('Axios error:', error.message);
-        toast.error("Axios error: " + error.message);
       }
+    } catch (err) {
+      return Promise.reject(err);
+    }
+
+    if(error.code === "ERR_BAD_REQUEST"){
+      const errObj = {...error}
+      errObj.response.data = {
+        success:false,
+        data:{},
+        message: errObj.response.data.message ? errObj.response.data.message : "ERR_BAD_REQUEST"
+      }
+
+      return Promise.reject(errObj);
+    }else{
       return Promise.reject(error);
     }
-  );
-  
-  export default axiosInstance;
+  }
+);
+
+axiosInstance.interceptors.request.use((config) => {
+
+  if (config.data instanceof FormData) {
+    config.headers['Content-Type'] = 'multipart/form-data';
+  } else {
+    config.headers['Content-Type'] = 'application/json';
+  }
+
+  return config;
+});
+
+export default axiosInstance;
+

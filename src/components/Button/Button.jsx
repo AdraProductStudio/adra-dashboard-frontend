@@ -1,9 +1,22 @@
 import React from "react";
 import Button from "react-bootstrap/Button";
 
-const ButtonComponent = ({title, variant, as, rootComponent, clickFunction}) => {  
+const ButtonComponent = ({ title,
+  rootComponent,
+  as,
+  className,
+  type,
+  clickFunction 
+}) => {
+
+
   return (
-    <Button as={as} variant={variant} rootComponent={rootComponent} onClick={clickFunction}>
+    <Button
+      as={as}
+      type={type}
+      className={`btn ${className}`}
+      onClick={clickFunction}
+    >
       {title}
     </Button>
   );

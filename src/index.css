@@ -1,3 +1,20 @@
+:root {
+  --root-height: 100vh;
+  --sidebar-y-padding: 1rem;
+  --sidebar-width: 14.5rem;
+  --sidebar-header-height: 7.7rem;
+  --btn-brand-bg-color: black;
+  --btn-brand-color: white;
+  --header-height: 4rem;
+  --main-background-color: #f9f9f9;
+  --main-content-padding-y: 2rem .9rem;
+}
+
+.row {
+  --bs-gutter-x: 0rem !important;
+  --bs-gutter-y: 0 !important;
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -7,7 +24,62 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+.eye-absolute {
+  position: absolute;
+  top: 3rem;
+  right: 1.4rem;
+}
+
+
+
+
+/* sidebar  */
+.sidebar {
+  width: var(--sidebar-width);
+  height: var(--root-height);
+  padding: var(--sidebar-y-padding) 0;
+}
+
+.sidebar-header {
+  height: calc(var(--sidebar-header-height) - var(--sidebar-y-padding));
+}
+
+.sidebar-body {
+  height: calc(var(--root-height) - (var(--sidebar-y-padding) + 2rem) - var(--sidebar-header-height));
+}
+
+.navlink-sidebar.active {
+  background-color: var(--btn-brand-bg-color);
+  color: var(--btn-brand-color) !important;
+  padding: .5rem;
+  text-decoration: none;
+}
+
+.navlink-sidebar:hover {
+  background-color: #e3e3e382;
+  /* color: var(--btn-brand-color) !important; */
+  padding: .5rem;
+  font-weight: bold;
+  text-decoration: none;
+  transition: all .1s linear;
+}
+
+.navlink-sidebar.active:hover{
+  background-color: var(--btn-brand-bg-color);
+  color: var(--btn-brand-color) !important;
+  padding: .5rem;
+  text-decoration: none;
+}
+
+.navlink-sidebar.active svg path{
+  stroke: white !important;
+}
+/*  */
+
+
+/* main  */
+.main {
+  background-color: var(--main-background-color);
+  height: var(--root-height);
+  padding: var(--main-content-padding-y);
 }
