@@ -2,12 +2,6 @@ import Header from 'components/Panel_compnent/Header';
 import Sidebar from 'components/Panel_compnent/Sidebar'
 import React from 'react';
 import { Outlet } from 'react-router-dom';
-import { RiDashboardLine } from "react-icons/ri";
-import { LuUsers } from "react-icons/lu";
-import { FaRegAddressCard } from "react-icons/fa";
-import { HiOutlineCurrencyDollar } from "react-icons/hi2";
-import { IoCalendarOutline } from "react-icons/io5";
-import { CiMemoPad } from "react-icons/ci";
 
 const Layout = () => {
 
