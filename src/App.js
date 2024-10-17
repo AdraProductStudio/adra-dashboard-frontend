@@ -8,7 +8,8 @@ const App = () => {
   return (
     <>
 
-      <Routes>
+       <Routes>
+        
         <Route element={<Layout/>}>
             <Route index element={<h1>Dashboard</h1>}/>
             <Route path="employees" element={<h1>Employer</h1>}/>
@@ -22,9 +23,55 @@ const App = () => {
         </Route>
 
         <Route path="*" element={<h1>Not found</h1>}/>
-      </Routes>
+      </Routes> 
     </>
   );
-};
 
+}
 export default App;
+// const [modalShow,setModalShow] = useState(true);
+// const handleModel = () => setModalShow(!modalShow);
+// const modalHedaerFun = () => {
+//   return (
+//     <span>asdiugaiusdd</span>
+//   )
+// }
+
+// const modalBodyFun = () => {
+//   return (
+//     <div>
+//       modal body
+//     </div>
+//   )
+// }
+// return (
+//   <>
+//     <ModalComponent
+//       modalClassname="bg-light"
+//       modalSize="md"
+//       modalCentered={true}
+//       modalShow={modalShow}
+//       handleModel={handleModel}
+//       modalFullscreen={false}
+//       // modalDialogClassName="modal-90w"
+//       modalHeaderClassname="text-danger"
+//       modalHeader={modalHedaerFun()}
+//       modalBodyClassname="ps-4"
+//       modalBody={modalBodyFun()}
+//       modalFooterClassname="d-flex text-end"
+
+//       btnOne={false}
+//       btnOneClassName="btn col-4"
+//       btnOneName="Close"
+//       btnOneTitle="Close"
+      
+
+//       btnTwo={true}
+//       btnTwoClassName="btn w-100"
+//       btnTwoName="Close"
+//       btnTwoTitle="Close"
+//     />
+//   </>
+// );
+// };
+

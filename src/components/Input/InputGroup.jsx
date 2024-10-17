@@ -4,7 +4,7 @@ import { IoEyeOffOutline } from "react-icons/io5";
 import { IoEyeOutline } from "react-icons/io5";
 
 const InputGroup = ({
-    rootComponent,
+    componentFrom,
     inputType,
     controlId,
     className,

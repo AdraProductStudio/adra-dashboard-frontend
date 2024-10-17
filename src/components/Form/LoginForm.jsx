@@ -60,9 +60,10 @@ const LoginForm = () => {
 
             <ButtonComponent
                 type="button"
-                className={"btn btn-md w-100"}
+                className="btn-md w-100"
                 clickFunction={handleSubmit}
-                title={"Submit form"} 
+                title="Submit form"
+                buttonName="Submit form"
             />
         </Form>
     )

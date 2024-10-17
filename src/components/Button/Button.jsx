@@ -1,8 +1,10 @@
 import React from "react";
 import Button from "react-bootstrap/Button";
 
-const ButtonComponent = ({ title,
-  rootComponent,
+const ButtonComponent = ({ 
+  componentFrom,
+  title,
+  buttonName,
   as,
   className,
   type,
@@ -14,10 +16,11 @@ const ButtonComponent = ({ title,
     <Button
       as={as}
       type={type}
-      className={`btn ${className}`}
+      className={className}
       onClick={clickFunction}
+      title={title}
     >
-      {title}
+      {buttonName}
     </Button>
   );
 };

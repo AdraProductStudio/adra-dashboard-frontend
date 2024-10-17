@@ -2,7 +2,7 @@ import React from 'react'
 import { NavLink } from 'react-router-dom'
 
 const NavLinkComp = ({
-  rootComponent,
+  componentFrom,
   to,
   title,
   className

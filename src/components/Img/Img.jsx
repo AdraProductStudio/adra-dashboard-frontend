@@ -2,12 +2,13 @@ import React from 'react'
 import { Image } from 'react-bootstrap'
 
 const Img = ({
-    rootComponent,
+    componentFrom,
     src,
     alt,
     className,
     width,
-    height
+    height,
+    fluid,
 }) => {
 
     return (
@@ -17,7 +18,7 @@ const Img = ({
             width={width}
             height={height}
             alt={alt}
-            fluid
+            fluid={fluid}
         />
     )
 }

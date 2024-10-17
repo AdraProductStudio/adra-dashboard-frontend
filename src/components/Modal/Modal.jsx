@@ -2,7 +2,7 @@ import ButtonComponent from 'components/Button/Button';
 import Modal from 'react-bootstrap/Modal';
 
 const ModalComponent = ({
-  rootComponent,
+  componentFrom,
 
   modalSize,
   modalClassname,
@@ -20,10 +20,18 @@ const ModalComponent = ({
 
   modalFooterClassname,
   handleSubmitModel,
-  closeBtn,
-  closeBtnClassName,
-  saveBtn,
-  saveBtnClassName
+
+  btnOne,
+  btnOneClassName,
+  btnOneName,
+  btnOneTitle,
+
+
+  btnTwo,
+  btnTwoClassName,
+  btnTwoName,
+  btnTwoTitle
+
 }) => {
 
   return (
@@ -52,15 +60,16 @@ const ModalComponent = ({
 
 
       {/* Footer */}
-      <Modal.Footer className={modalFooterClassname}>
+      <Modal.Footer className={!btnOne && !btnTwo ? "border-0" : modalFooterClassname}>
         {
-          closeBtn ?
+          btnOne ?
             <div className="col">
               <ButtonComponent
                 type="button"
-                className={closeBtnClassName}
+                className={btnOneClassName}
                 clickFunction={handleModel}
-                title="Close"
+                title={btnOneTitle}
+                buttonName={btnOneName}
               />
             </div>
             :
@@ -68,13 +77,14 @@ const ModalComponent = ({
         }
 
         {
-          saveBtn ?
+          btnTwo ?
             <div className="col">
               <ButtonComponent
                 type="button"
-                className={saveBtnClassName}
+                className={btnTwoClassName}
                 clickFunction={handleSubmitModel}
-                title="Save Changes"
+                title={btnTwoTitle}
+                buttonName={btnTwoName}
               />
             </div>
             :

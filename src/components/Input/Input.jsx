@@ -1,6 +1,6 @@
 import Form from 'react-bootstrap/Form';
 
-const Input = ({ rootComponent,
+const Input = ({ componentFrom,
     className,
     htmlFor,
     as,

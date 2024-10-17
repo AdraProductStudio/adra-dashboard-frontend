@@ -1,13 +1,15 @@
 :root {
   --root-height: 100vh;
   --sidebar-y-padding: 1rem;
-  --sidebar-width: 14.5rem;
+  --sidebar-width: 17.5rem;
   --sidebar-header-height: 7.7rem;
+  --sidebar-body-padding-y: .5rem .9rem;
   --btn-brand-bg-color: black;
   --btn-brand-color: white;
   --header-height: 4rem;
   --main-background-color: #f9f9f9;
   --main-content-padding-y: 2rem .9rem;
+  --page-main-content-padding-y: 1rem .2rem;
 }
 
 .row {
@@ -44,8 +46,18 @@ body {
   height: calc(var(--sidebar-header-height) - var(--sidebar-y-padding));
 }
 
-.sidebar-body {
+.sidebar-body-with-footer {
+  height: calc(var(--root-height) - (var(--sidebar-y-padding) + 2rem) - var(--sidebar-header-height) - var(--sidebar-body-footer-height));
+  padding: var(--sidebar-body-padding-y);
+}
+
+.sidebar-body-without-footer {
   height: calc(var(--root-height) - (var(--sidebar-y-padding) + 2rem) - var(--sidebar-header-height));
+  padding: var(--sidebar-body-padding-y);
+}
+
+.sidebar-footer {
+  height: var(--sidebar-body-footer-height);
 }
 
 .navlink-sidebar.active {
@@ -82,4 +94,9 @@ body {
   background-color: var(--main-background-color);
   height: var(--root-height);
   padding: var(--main-content-padding-y);
+}
+
+.modal-90w{
+  width: 60vw !important;
+  max-width: 60vw !important;
 }
