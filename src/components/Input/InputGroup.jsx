@@ -6,17 +6,21 @@ import { IoEyeOutline } from "react-icons/io5";
 const InputGroup = ({
     componentFrom,
     inputType,
-    controlId,
+    inputControlId,
     className,
     change,
     gropuClassName,
     placeholder,
-    defaultValue,
+    value,
     inputHeading,
     inputError,
     inputSuccess,
     eyeState,
-    eyeFunctionClick
+    eyeFunctionClick,
+    inputId,
+    inputAccept,
+    inputHidden,
+    inputPattern
 }) => {
 
     return (
@@ -25,7 +29,7 @@ const InputGroup = ({
                 `position-relative ${gropuClassName ? gropuClassName : ''}`
                 :
                 gropuClassName
-        } controlId={controlId}>
+        } controlId={inputControlId}>
             <Form.Label>{inputHeading}</Form.Label>
             <Form.Control
                 required
@@ -37,8 +41,13 @@ const InputGroup = ({
                         inputType
                 }
                 placeholder={placeholder}
-                defaultValue={defaultValue}
+                value={value}
+                name={inputHeading}
                 onChange={change}
+                id={inputId}
+                accept={inputAccept}
+                hidden={inputHidden}
+                pattern={inputPattern}
             />
             <Form.Control.Feedback type="valid">
                 {inputSuccess}

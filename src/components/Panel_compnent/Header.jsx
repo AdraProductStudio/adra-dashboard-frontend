@@ -1,45 +1,56 @@
+import React from 'react';
 import ButtonComponent from 'components/Button/Button';
-import React from 'react'
-import Card from 'react-bootstrap/Card';
-import { useLocation } from 'react-router-dom';
+import HeaderCard from 'components/Card/HeaderCard';
+import Icons from 'Utils/Icons';
 
 const Header = ({
   offcanvasOn,
   offcanvasOnButton
 }) => {
 
-  const location = useLocation()
+  const headerContentFunc = () => {
+    return <>
+      <div className="col-sm-8 d-flex flex-wrap align-items-center justify-content-end">
+        <div className="header-icon-tag-width">
+          <ButtonComponent
+            type="button"
+            className={'header-icon-width'}
+            buttonName= {Icons.notificationIcon}
+          />
+        </div>
 
-  const handleHeaderTitle = () => {
-    const path = location.pathname.split('/');
-    return path[path.length - 1];
+        <div className="header-icon-tag-width">
+            <ButtonComponent
+              type="button"
+              className={'header-icon-width'}
+              buttonName={Icons.profileIcon}
+            />
+        </div>
+
+        {
+          offcanvasOn ?
+            <div className={`d-inline-block header-icon-tag-width ${offcanvasOn !== '' ? `d-${offcanvasOn}-none` : 'd-none'}`}>
+              <ButtonComponent
+                type="button"
+                clickFunction={offcanvasOnButton}
+                buttonName="open"
+              />
+            </div>
+            :
+            null
+        }
+      </div>
+    </>
   }
 
   return (
-    <Card className='w-100 border-0'>
-      <Card.Body>
-        <Card.Title className='mb-0 row justify-content-evenly align-items-center'>
-          <div className="col">
-            {handleHeaderTitle()}
-          </div>
 
-          <div className="col text-end">
-            {
-              offcanvasOn ?
-                <div className={`d-block ${offcanvasOn !== '' ? `d-${offcanvasOn}-none` : 'd-none'}`}>
-                  <ButtonComponent
-                    type="button"
-                    clickFunction={offcanvasOnButton}
-                    buttonName="open"
-                  />
-                </div>
-                :
-                null
-            }
-          </div>
-        </Card.Title>
-      </Card.Body>
-    </Card>
+    <HeaderCard
+      cardClassName='w-100 border-0 header-card'
+      cardTitleClassName="row justify-content-end mb-0"
+      cardContent={headerContentFunc()}
+    />
+
   )
 }
 

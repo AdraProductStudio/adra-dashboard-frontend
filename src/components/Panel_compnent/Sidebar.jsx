@@ -104,11 +104,11 @@ const Sidebar = ({
                                 <div className="sidebar-header">
                                     <div className="row h-100 align-items-center justify-content-center">
                                         <div className="col text-center">
-                                            {headerFun('30%', '50px', companyLogo)}
+                                            {headerFun('33%', '50px', companyLogo)}
                                         </div>
                                     </div>
                                 </div>
-                                <hr className=''/>
+                                <hr className='hr-line-color'/>
                             </>
                             :
                             null

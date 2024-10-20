@@ -1,4 +1,3 @@
-import ButtonComponent from 'components/Button/Button';
 import Modal from 'react-bootstrap/Modal';
 
 const ModalComponent = ({
@@ -7,8 +6,12 @@ const ModalComponent = ({
   modalSize,
   modalClassname,
   modalDialogClassName,
+  modalClickOutsideHide,
   modalFullscreen,
   modalCentered,
+
+  showModalHeader,
+  modalHeaderTitleClassname,
   modalHeaderClassname,
   modalHeader,
 
@@ -18,26 +21,18 @@ const ModalComponent = ({
   modalShow,
   handleModel,
 
+  showModalFooter,
   modalFooterClassname,
-  handleSubmitModel,
-
-  btnOne,
-  btnOneClassName,
-  btnOneName,
-  btnOneTitle,
-
-
-  btnTwo,
-  btnTwoClassName,
-  btnTwoName,
-  btnTwoTitle
-
+  modalFooter,
 }) => {
 
   return (
+
     <Modal
       show={modalShow}
       size={modalSize}
+      // modalClickOutsideHide={}
+      backdrop={modalClickOutsideHide ? "" : "static"}
       fullscreen={modalFullscreen}
       centered={modalCentered}
       contentClassName={modalClassname}
@@ -46,11 +41,16 @@ const ModalComponent = ({
     >
 
       {/* Header */}
-      <Modal.Header closeButton className={modalHeaderClassname}>
-        <Modal.Title>
-          {modalHeader}
-        </Modal.Title>
-      </Modal.Header>
+      {
+        showModalHeader ? <Modal.Header closeButton className={modalHeaderClassname}>
+          <Modal.Title className={modalHeaderTitleClassname}>
+            {modalHeader}
+          </Modal.Title>
+        </Modal.Header>
+          :
+          null
+      }
+
 
 
       {/* Body */}
@@ -60,37 +60,14 @@ const ModalComponent = ({
 
 
       {/* Footer */}
-      <Modal.Footer className={!btnOne && !btnTwo ? "border-0" : modalFooterClassname}>
-        {
-          btnOne ?
-            <div className="col">
-              <ButtonComponent
-                type="button"
-                className={btnOneClassName}
-                clickFunction={handleModel}
-                title={btnOneTitle}
-                buttonName={btnOneName}
-              />
-            </div>
-            :
-            null
-        }
+      {
+        showModalFooter ? <Modal.Footer className={modalFooterClassname}>
+          {modalFooter}
+        </Modal.Footer>
+          :
+          null
+      }
 
-        {
-          btnTwo ?
-            <div className="col">
-              <ButtonComponent
-                type="button"
-                className={btnTwoClassName}
-                clickFunction={handleSubmitModel}
-                title={btnTwoTitle}
-                buttonName={btnTwoName}
-              />
-            </div>
-            :
-            null
-        }
-      </Modal.Footer>
 
     </Modal>
   )

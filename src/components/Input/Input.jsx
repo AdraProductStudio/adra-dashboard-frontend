@@ -1,12 +1,14 @@
 import Form from 'react-bootstrap/Form';
 
-const Input = ({ componentFrom,
+const Input = ({ 
+    componentFrom,
     className,
     htmlFor,
     as,
     placeholder,
     inputHeading,
-    inputError }) => {
+    inputError 
+}) => {
 
     return (
         <>
