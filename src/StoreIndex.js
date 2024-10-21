@@ -1,10 +1,11 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit"
 import { thunk } from "redux-thunk"
 import campaignReducer from 'Redux/Slices/Human_Resource_slices/Campaign_slice';
-
+import commonReducer from 'Redux/Slices/Common_Slice/Common_slice';
 
 const reducers = combineReducers({
-    campaignStates: campaignReducer 
+    commonState: commonReducer,
+    campaignStates: campaignReducer
 })
 
 const store = configureStore({

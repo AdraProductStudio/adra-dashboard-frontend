@@ -31,6 +31,7 @@
   background-color: var(--btn-brand-outerLayer-bg-color) !important;
   color: var(--btn-brand-outerLayer-color) !important;
   border: 1px solid var(--btn-brand-outerLayer-border-color) !important;
+  font-size: 14px !important;
 }
 
 .row {
@@ -162,6 +163,7 @@ header {
   background-color: var(--btn-brand-bg-color) !important;
   border: 1px solid var(--btn-brand-border-color) !important;
   color: var(--btn-brand-color) !important;
+  font-size: 14px !important;
 }
 
 .btn-brand-color:hover {
@@ -199,12 +201,6 @@ header {
   border: 1px solid #dedcdc;
 }
 
-@media(min-width:768px) {
-  .create-button-size {
-    width: 11rem;
-  }
-}
-
 .modal-border-radius {
   border-radius: 10px !important;
 }
@@ -223,6 +219,10 @@ header {
   background: #FFF;
   box-shadow: 82px 50px 27px 0px rgba(79, 79, 79, 0.00), 52px 32px 25px 0px rgba(79, 79, 79, 0.01), 29px 18px 21px 0px rgba(79, 79, 79, 0.05), 13px 8px 15px 0px rgba(79, 79, 79, 0.09), 3px 2px 8px 0px rgba(79, 79, 79, 0.10);
   position: relative;
+}
+
+.campagin-card-body-fs {
+  font-size: 15px;
 }
 
 .campaign-card-header {
@@ -259,4 +259,52 @@ header {
 
 .cursor-pointer {
   cursor: pointer;
+}
+
+
+.btn-transparent {
+  background-color: transparent !important;
+}
+
+table thead,
+table tbody {
+  vertical-align: middle !important;
+}
+
+tbody td {
+  color: gray !important;
+  padding: .8rem !important;
+}
+
+thead th {
+  padding: 1rem !important;
+}
+
+
+
+.candidateTableOffcanvas {
+  width: 35vw !important;
+  max-width: 35vw !important;
+}
+
+.offcanvasHeaderHeight {
+  height: 7% !important;
+}
+
+.offcanvasBodyHeight {
+  height: 60% !important;
+}
+
+
+
+@media(min-width:768px) {
+  .create-button-size {
+    width: 11rem;
+  }
+}
+
+@media(min-width:576px) {
+  .responsive-not-found-width {
+    width: 24rem !important;
+  }
 }

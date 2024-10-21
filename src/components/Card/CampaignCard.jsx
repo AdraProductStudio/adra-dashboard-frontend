@@ -20,9 +20,9 @@ const CampaignCard = ({
                     {cardTitle}
                 </Card.Title>
 
-                <Card.Text className={`${cardTextClassName} cursor-pointer`} onClick={clickFunction}>
+                <div className={`${cardTextClassName} cursor-pointer`} onClick={clickFunction}>
                     {cardBody}
-                </Card.Text>
+                </div>
             </Card.Body>
         </Card>
     )

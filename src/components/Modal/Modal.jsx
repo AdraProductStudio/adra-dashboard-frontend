@@ -1,4 +1,6 @@
 import Modal from 'react-bootstrap/Modal';
+import { useDispatch, useSelector } from 'react-redux';
+import { updateModalShow } from 'Redux/Slices/Common_Slice/Common_slice';
 
 const ModalComponent = ({
   componentFrom,
@@ -18,26 +20,24 @@ const ModalComponent = ({
   modalBodyClassname,
   modalBody,
 
-  modalShow,
-  handleModel,
-
   showModalFooter,
   modalFooterClassname,
   modalFooter,
 }) => {
+  const dispatch = useDispatch();
+  const {modalShow} = useSelector((state)=>state.commonState);
 
   return (
 
     <Modal
       show={modalShow}
       size={modalSize}
-      // modalClickOutsideHide={}
       backdrop={modalClickOutsideHide ? "" : "static"}
       fullscreen={modalFullscreen}
       centered={modalCentered}
       contentClassName={modalClassname}
       dialogClassName={modalDialogClassName}
-      onHide={handleModel}
+      onHide={()=>dispatch(updateModalShow())}
     >
 
       {/* Header */}

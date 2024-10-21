@@ -10,7 +10,7 @@ const refreshToken = async () => {
 };
 
 const axiosInstance = axios.create({
-  baseURL: process.env.REACT_APP_API_URL,
+  baseURL: `${process.env.REACT_APP_API_URL}/api/v1/`,
   headers: {
     'Content-Type': 'application/json',
   }
@@ -53,12 +53,13 @@ axiosInstance.interceptors.response.use(
 
 axiosInstance.interceptors.request.use((config) => {
 
+
   if (config.data instanceof FormData) {
     config.headers['Content-Type'] = 'multipart/form-data';
   } else {
     config.headers['Content-Type'] = 'application/json';
   }
-
+  
   return config;
 });
 

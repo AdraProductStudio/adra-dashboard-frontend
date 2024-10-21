@@ -111,6 +111,182 @@ const uploadModalIcon = <svg xmlns="http://www.w3.org/2000/svg" width="54" heigh
     <path d="M49.5 22.5H40.5C33.75 22.5 31.5 20.25 31.5 13.5V4.5L49.5 22.5Z" stroke="#253F95" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
 </svg>
 
+const resumeAvailable = <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+    <path d="M9 17V11L7 13" stroke="#5E9559" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M9 11L11 13" stroke="#5E9559" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M22 10V15C22 20 20 22 15 22H9C4 22 2 20 2 15V9C2 4 4 2 9 2H14" stroke="#5E9559" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M22 10H18C15 10 14 9 14 6V2L22 10Z" stroke="#5E9559" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+</svg>
+
+const resumeUnAvailable = <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+    <path d="M9 17V11L7 13" stroke="red" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M9 11L11 13" stroke="red" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M22 10V15C22 20 20 22 15 22H9C4 22 2 20 2 15V9C2 4 4 2 9 2H14" stroke="red" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M22 10H18C15 10 14 9 14 6V2L22 10Z" stroke="red" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+</svg>
+
+const editIcon = <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+>
+    <path
+        d="M13.26 3.59997L5.04997 12.29C4.73997 12.62 4.43997 13.27 4.37997 13.72L4.00997 16.96C3.87997 18.13 4.71997 18.93 5.87997 18.73L9.09997 18.18C9.54997 18.1 10.18 17.77 10.49 17.43L18.7 8.73997C20.12 7.23997 20.76 5.52997 18.55 3.43997C16.35 1.36997 14.68 2.09997 13.26 3.59997Z"
+        stroke="#4945B5"
+        stroke-width="1.5"
+        stroke-miterlimit="10"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    />
+    <path
+        d="M11.89 5.05005C12.32 7.81005 14.56 9.92005 17.34 10.2"
+        stroke="#4945B5"
+        stroke-width="1.5"
+        stroke-miterlimit="10"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    />
+    <path
+        d="M3 22H21"
+        stroke="#4945B5"
+        stroke-width="1.5"
+        stroke-miterlimit="10"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    />
+</svg>
+
+const expandIcon = <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+>
+    <path
+        d="M9 22H15C20 22 22 20 22 15V9C22 4 20 2 15 2H9C4 2 2 4 2 9V15C2 20 4 22 9 22Z"
+        stroke="#E37592"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    />
+    <path
+        d="M18 6L6 18"
+        stroke="#E37592"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    />
+    <path
+        d="M18 10V6H14"
+        stroke="#E37592"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    />
+    <path
+        d="M6 14V18H10"
+        stroke="#E37592"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    />
+</svg>
+
+const deleteIcon = <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="25"
+    height="18"
+    viewBox="0 0 25 24"
+    fill="none"
+>
+    <path
+        d="M21.5 5.97998C18.17 5.64998 14.82 5.47998 11.48 5.47998C9.5 5.47998 7.52 5.57998 5.54 5.77998L3.5 5.97998"
+        stroke="black"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    />
+    <path
+        d="M9 4.97L9.22 3.66C9.38 2.71 9.5 2 11.19 2H13.81C15.5 2 15.63 2.75 15.78 3.67L16 4.97"
+        stroke="black"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    />
+    <path
+        d="M19.35 9.14001L18.7 19.21C18.59 20.78 18.5 22 15.71 22H9.28999C6.49999 22 6.40999 20.78 6.29999 19.21L5.64999 9.14001"
+        stroke="black"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    />
+    <path
+        d="M10.83 16.5H14.16"
+        stroke="black"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    />
+    <path
+        d="M10 12.5H15"
+        stroke="black"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    />
+</svg>
+
+const pendingIcon = <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="25"
+    height="18"
+    viewBox="0 0 25 24"
+    fill="none"
+>
+    <g clip-path="url(#clip0_1_3325)">
+        <path
+            d="M7.78906 0.0656395C7.39531 0.164078 7.1 0.332827 6.8 0.632828C6.49531 0.937515 6.30781 1.27033 6.22344 1.67814C6.18594 1.85158 6.17188 3.35626 6.17188 6.64689V11.3719L5.72188 11.4563C4.43281 11.6953 3.34063 12.2813 2.39844 13.2375C1.63438 14.0063 1.20781 14.7 0.879688 15.6797C0.25625 17.5547 0.532813 19.5563 1.64844 21.2344C1.775 21.4266 2.1125 21.8203 2.39844 22.1063C3.30781 23.025 4.25938 23.5547 5.58594 23.8734L6.00781 23.9719L14.2344 23.9906C20.2625 24 22.5359 23.9906 22.7422 23.9531C23.1219 23.8781 23.6094 23.6156 23.8625 23.3438C24.1109 23.0813 24.3266 22.6688 24.4016 22.3219C24.4391 22.1438 24.4531 19.7156 24.4531 13.6594C24.4531 6.04689 24.4438 5.23126 24.3781 5.09533C24.275 4.88908 19.5969 0.201576 19.3813 0.089077C19.2125 0.00470161 19.0531 1.52588e-05 13.6156 0.00470161C9.30781 0.00938988 7.97188 0.0234528 7.78906 0.0656395ZM18.3594 3.46876C18.3594 5.44689 18.3641 5.54064 18.4531 5.71876C18.5141 5.84064 18.6125 5.93908 18.7344 6.00001C18.9125 6.08908 19.0063 6.09376 20.9844 6.09376H23.0469V14.0625C23.0469 21.9609 23.0469 22.0359 22.9531 22.2188C22.8922 22.3406 22.7938 22.4391 22.6719 22.5C22.4891 22.5938 22.4094 22.5938 16.6859 22.5938H10.8828L11.3563 22.1109C12.275 21.1828 12.8563 20.0813 13.0906 18.825L13.175 18.375H16.8922C20.5297 18.375 20.6188 18.375 20.7969 18.2813C21.0078 18.1735 21.1719 17.9063 21.1719 17.6719C21.1719 17.4375 21.0078 17.1703 20.7969 17.0625C20.6188 16.9688 20.5297 16.9688 16.8922 16.9688H13.1656L13.1375 16.7438C13.0391 16.0781 12.725 15.1688 12.3781 14.5688C12.2656 14.3719 12.1719 14.1938 12.1719 14.1797C12.1719 14.1656 14.0703 14.1563 16.3906 14.1563C20.5297 14.1563 20.6188 14.1563 20.7969 14.0625C21.0078 13.9547 21.1719 13.6875 21.1719 13.4531C21.1719 13.2188 21.0078 12.9516 20.7969 12.8438C20.6141 12.75 20.5297 12.75 15.7344 12.75H10.8547L10.6109 12.5719C9.82344 11.986 8.74531 11.5406 7.80313 11.4094L7.57813 11.3813V6.66095C7.58281 1.35939 7.55469 1.74845 7.93438 1.51876L8.11719 1.40627H13.2406H18.3594V3.46876ZM20.9141 3.56251L22.0391 4.68751H20.9H19.7656V3.56251C19.7656 2.94376 19.7703 2.43751 19.7797 2.43751C19.7844 2.43751 20.2953 2.94376 20.9141 3.56251ZM8 12.8813C8.92813 13.125 9.71094 13.5656 10.3484 14.1985C10.9813 14.8313 11.4078 15.5906 11.6703 16.5469C11.7453 16.8375 11.7641 17.0344 11.7641 17.6719C11.7641 18.5156 11.7172 18.7734 11.4266 19.5234C10.9859 20.6625 9.86563 21.7828 8.72656 22.2234C7.97656 22.5141 7.71875 22.5609 6.875 22.5609C6.03125 22.5609 5.77344 22.5141 5.02344 22.2234C3.88438 21.7828 2.76406 20.6625 2.32344 19.5234C2.0375 18.7828 1.98594 18.511 1.98125 17.6953C1.97656 16.8563 2.05625 16.4438 2.35156 15.7453C2.99375 14.2219 4.49844 13.0547 6.14844 12.7969C6.58906 12.7313 7.59219 12.7781 8 12.8813Z"
+            fill="black"
+        />
+        <path
+            d="M9.81875 8.62969C9.61719 8.73281 9.45312 9.00937 9.45312 9.23438C9.45312 9.46875 9.61719 9.73594 9.82812 9.84375C10.0109 9.9375 10.0906 9.9375 15.3125 9.9375C20.5344 9.9375 20.6141 9.9375 20.7969 9.84375C21.0078 9.73594 21.1719 9.46875 21.1719 9.23438C21.1719 9 21.0078 8.73281 20.7969 8.625C20.6141 8.53125 20.5344 8.53125 15.3031 8.53125C10.1094 8.53594 9.9875 8.53594 9.81875 8.62969Z"
+            fill="black"
+        />
+        <path
+            d="M6.5375 14.2547C6.42969 14.3109 6.32188 14.4188 6.26562 14.5313C6.17656 14.7047 6.17188 14.8031 6.17188 16.2656C6.17188 17.7281 6.17656 17.8266 6.26562 18C6.32656 18.1219 6.425 18.2203 6.54688 18.2813C6.71563 18.3656 6.81875 18.375 7.8125 18.375C8.80625 18.375 8.90938 18.3656 9.07812 18.2813C9.28906 18.1734 9.45313 17.9063 9.45313 17.6719C9.45313 17.4375 9.28906 17.1703 9.07812 17.0625C8.91875 16.9828 8.80156 16.9688 8.23438 16.9688H7.57812V15.8438C7.57812 14.8031 7.56875 14.7 7.48438 14.5313C7.31094 14.1891 6.88906 14.0672 6.5375 14.2547Z"
+            fill="black"
+        />
+    </g>
+    <defs>
+        <clipPath id="clip0_1_3325">
+            <rect
+                width="24"
+                height="24"
+                fill="white"
+                transform="translate(0.5)"
+            />
+        </clipPath>
+    </defs>
+</svg>
+
+const callIcon = <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="25"
+    height="18"
+    viewBox="0 0 25 24"
+    fill="none"
+>
+    <path
+        d="M22.47 18.33C22.47 18.69 22.39 19.06 22.22 19.42C22.05 19.78 21.83 20.12 21.54 20.44C21.05 20.98 20.51 21.37 19.9 21.62C19.3 21.87 18.65 22 17.95 22C16.93 22 15.84 21.76 14.69 21.27C13.54 20.78 12.39 20.12 11.25 19.29C10.1 18.45 9.01 17.52 7.97 16.49C6.94 15.45 6.01 14.36 5.18 13.22C4.36 12.08 3.7 10.94 3.22 9.81C2.74 8.67 2.5 7.58 2.5 6.54C2.5 5.86 2.62 5.21 2.86 4.61C3.1 4 3.48 3.44 4.01 2.94C4.65 2.31 5.35 2 6.09 2C6.37 2 6.65 2.06 6.9 2.18C7.16 2.3 7.39 2.48 7.57 2.74L9.89 6.01C10.07 6.26 10.2 6.49 10.29 6.71C10.38 6.92 10.43 7.13 10.43 7.32C10.43 7.56 10.36 7.8 10.22 8.03C10.09 8.26 9.9 8.5 9.66 8.74L8.9 9.53C8.79 9.64 8.74 9.77 8.74 9.93C8.74 10.01 8.75 10.08 8.77 10.16C8.8 10.24 8.83 10.3 8.85 10.36C9.03 10.69 9.34 11.12 9.78 11.64C10.23 12.16 10.71 12.69 11.23 13.22C11.77 13.75 12.29 14.24 12.82 14.69C13.34 15.13 13.77 15.43 14.11 15.61C14.16 15.63 14.22 15.66 14.29 15.69C14.37 15.72 14.45 15.73 14.54 15.73C14.71 15.73 14.84 15.67 14.95 15.56L15.71 14.81C15.96 14.56 16.2 14.37 16.43 14.25C16.66 14.11 16.89 14.04 17.14 14.04C17.33 14.04 17.53 14.08 17.75 14.17C17.97 14.26 18.2 14.39 18.45 14.56L21.76 16.91C22.02 17.09 22.2 17.3 22.31 17.55C22.41 17.8 22.47 18.05 22.47 18.33Z"
+        stroke="black"
+        stroke-width="1.5"
+        stroke-miterlimit="10"
+    />
+</svg>
+
 const Icons = {
     pulsIconBlack,
     dashboardIcon,
@@ -132,8 +308,25 @@ const Icons = {
     sortbyIcon,
     filterIcon,
     uploadIcon,
-    uploadModalIcon
+    uploadModalIcon,
+    resumeAvailable,
+    resumeUnAvailable,
+    editIcon,
+    expandIcon,
+    pendingIcon,
+    callIcon
 }
 
 
 export default Icons
+
+
+
+
+
+
+// const buttonDataOne = [
+//     { title: "Delete", icon: Icons.deleteIcon, name: 'Delete', className: "btn-brand-outerLayer-color" },
+//     { title: "Pending", icon: Icons.pendingIcon, name: 'Pending', className: "btn-brand-outerLayer-color create-button-size" },
+//     { title: "make a call", icon: Icons.callIcon, name: 'make a call', className: "btn-brand-outerLayer-color create-button-size" }
+// ]
