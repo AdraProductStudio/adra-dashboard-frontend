@@ -1,0 +1,24 @@
+version: 1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - echo "Starting preBuild phase"
+        - echo "Setting REACT_APP_UNDER_DEVELOPMENT=true for deployment"
+        - echo "REACT_APP_UNDER_DEVELOPMENT=true" >> .env
+    build:
+      commands:
+        - npm install
+        - npm run build
+    postBuild:
+      commands:
+        - echo "Deployment complete"
+        - echo "Switching REACT_APP_UNDER_DEVELOPMENT to false"
+        - echo "REACT_APP_UNDER_DEVELOPMENT=false" >> .env
+  artifacts:
+    baseDirectory: build
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - node_modules/**/*

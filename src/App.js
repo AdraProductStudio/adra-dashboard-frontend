@@ -28,28 +28,31 @@ const App = () => {
   });
 
   return isOnline ?
-    <HelmetProvider>
-      <ToastContainer theme='light' />
-      <Routes>
+    process.env.REACT_APP_UNDER_DEVELOPMENT == "true" ?
+      <p>under development</p>
+      :
+      <HelmetProvider>
+        <ToastContainer theme='light' />
+        <Routes>
 
-        <Route element={<Layout />}>
-          <Route index element={<h1>Dashboard</h1>} />
-          <Route path="employees" element={<h1>Employer</h1>} />
-          <Route path="attendance" element={<h1>Attendance</h1>} />
-          <Route path="payroll" element={<h1>Payroll</h1>} />
-          <Route path="interview">
-            <Route index element={<InterviewComp />} />
-            <Route path=":id" element={<CampaignDetails />} />
+          <Route element={<Layout />}>
+            <Route index element={<h1>Dashboard</h1>} />
+            <Route path="employees" element={<h1>Employer</h1>} />
+            <Route path="attendance" element={<h1>Attendance</h1>} />
+            <Route path="payroll" element={<h1>Payroll</h1>} />
+            <Route path="interview">
+              <Route index element={<InterviewComp />} />
+              <Route path=":id" element={<CampaignDetails />} />
+            </Route>
+            <Route path="circular" element={<h1>Circular</h1>} />
+            <Route path="invoices" element={<h1>Invoices</h1>} />
+            <Route path="notes" element={<h1>Notes</h1>} />
+            <Route path="documents" element={<h1>Documents</h1>} />
           </Route>
-          <Route path="circular" element={<h1>Circular</h1>} />
-          <Route path="invoices" element={<h1>Invoices</h1>} />
-          <Route path="notes" element={<h1>Notes</h1>} />
-          <Route path="documents" element={<h1>Documents</h1>} />
-        </Route>
 
-        <Route path="*" element={<h1>Not found</h1>} />
-      </Routes>
-    </HelmetProvider>
+          <Route path="*" element={<h1>Not found</h1>} />
+        </Routes>
+      </HelmetProvider>
     :
     <p>No internet connection</p>
 }
