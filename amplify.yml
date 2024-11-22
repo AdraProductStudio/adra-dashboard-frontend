@@ -5,7 +5,7 @@ frontend:
       commands:
         - echo "Starting preBuild phase"
         - echo "Setting REACT_APP_UNDER_DEVELOPMENT=true for deployment"
-        - echo "REACT_APP_UNDER_DEVELOPMENT=true" >> .env
+        - export REACT_APP_UNDER_DEVELOPMENT=true
     build:
       commands:
         - npm install
@@ -14,7 +14,7 @@ frontend:
       commands:
         - echo "Deployment complete"
         - echo "Switching REACT_APP_UNDER_DEVELOPMENT to false"
-        - echo "REACT_APP_UNDER_DEVELOPMENT=false" >> .env
+        - export REACT_APP_UNDER_DEVELOPMENT=false
   artifacts:
     baseDirectory: build
     files:
