@@ -1,0 +1,18 @@
+{
+  "files": {
+    "main.css": "/adra-dashboard-frontend/static/css/main.cbe30168.css",
+    "main.js": "/adra-dashboard-frontend/static/js/main.87744c52.js",
+    "static/media/Done-rafiki 1.png": "/adra-dashboard-frontend/static/media/Done-rafiki 1.c73f5fdb88ee214f204d.png",
+    "static/media/Completed steps-amico 1.png": "/adra-dashboard-frontend/static/media/Completed steps-amico 1.5f541766f2ebe9e5378f.png",
+    "static/media/Task_empty.png": "/adra-dashboard-frontend/static/media/Task_empty.6f58db6dc29ceaf7ba99.png",
+    "static/media/company_logo.png": "/adra-dashboard-frontend/static/media/company_logo.acc47529927dd2bb1b46.png",
+    "static/media/Group 1261156335.png": "/adra-dashboard-frontend/static/media/Group 1261156335.339a5116f35ad3f5f94b.png",
+    "index.html": "/adra-dashboard-frontend/index.html",
+    "main.cbe30168.css.map": "/adra-dashboard-frontend/static/css/main.cbe30168.css.map",
+    "main.87744c52.js.map": "/adra-dashboard-frontend/static/js/main.87744c52.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.cbe30168.css",
+    "static/js/main.87744c52.js"
+  ]
+}
