@@ -16,7 +16,7 @@ import Layout from "Views/Admin/Layout/Layout";
 const App = () => {
 
   return (
-    <HelmetProvider basename={process.env.PUBLIC_URL}>
+    <HelmetProvider >
       <ToastContainer theme='light' />
       <Routes>
         <Route element={<InitializeProjectSetup />}>
