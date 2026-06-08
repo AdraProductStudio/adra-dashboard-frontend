@@ -48,56 +48,56 @@ const JsonData = () => {
 
     const jsonOnly = {
         adminSidebarMenus: [
-            {
-                icon: Icons.dashboardIcon,
-                name: "Dashboard",
-                route: "/dashboard/home"
-            },
-            {
-                icon: Icons?.employeeIcon,
-                name: "Employees",
-                route: "/dashboard/employees"
-            },
-            {
-                icon: Icons.attendanceIcon,
-                name: "Attendance",
-                route: "/dashboard/attendance"
-            },
-            {
-                icon: Icons.payrollIcon,
-                name: "Payroll",
-                route: "/dashboard/payroll"
-            },
+            // {
+            //     icon: Icons.dashboardIcon,
+            //     name: "Dashboard",
+            //     route: "/dashboard/home"
+            // },
+            // {
+            //     icon: Icons?.employeeIcon,
+            //     name: "Employees",
+            //     route: "/dashboard/employees"
+            // },
+            // {
+            //     icon: Icons.attendanceIcon,
+            //     name: "Attendance",
+            //     route: "/dashboard/attendance"
+            // },
+            // {
+            //     icon: Icons.payrollIcon,
+            //     name: "Payroll",
+            //     route: "/dashboard/payroll"
+            // },
             {
                 icon: Icons.interviewIcon,
                 name: "Interview",
                 route: "/dashboard/interview"
             },
-            {
-                icon: Icons.circularIcon,
-                name: "Circular",
-                route: "/dashboard/circular"
-            },
-            {
-                icon: Icons.invoicesIcon,
-                name: "Invoices",
-                route: "/dashboard/invoices"
-            },
-            {
-                icon: Icons.notesIcon,
-                name: "Notes",
-                route: "/dashboard/notes"
-            },
-            {
-                icon: Icons.doocumentIcon,
-                name: "Documents",
-                route: "/dashboard/documents"
-            },
-            {
-                icon: Icons.doocumentIcon,
-                name: "Fellowship candidates",
-                route: "/dashboard/fellowship_candidates"
-            }
+            // {
+            //     icon: Icons.circularIcon,
+            //     name: "Circular",
+            //     route: "/dashboard/circular"
+            // },
+            // {
+            //     icon: Icons.invoicesIcon,
+            //     name: "Invoices",
+            //     route: "/dashboard/invoices"
+            // },
+            // {
+            //     icon: Icons.notesIcon,
+            //     name: "Notes",
+            //     route: "/dashboard/notes"
+            // },
+            // {
+            //     icon: Icons.doocumentIcon,
+            //     name: "Documents",
+            //     route: "/dashboard/documents"
+            // },
+            // {
+            //     icon: Icons.doocumentIcon,
+            //     name: "Fellowship candidates",
+            //     route: "/dashboard/fellowship_candidates"
+            // }
         ],
         states: [
             { value: 1, label: 'Andaman and Nicobar Islands' },

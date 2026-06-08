@@ -16,17 +16,17 @@ const InterviewCandidatesHeader = ({
   // const dispatch = useDispatch();
 
   return (
-    <header>
-      <Card className='shadow-sm border-0 h-100'>
+    <header className='shadow-sm bg-white border-0'>
+      <Card className='border-0 h-100'>
         <Card.Body className='h-100'>
           <div className="container-fluid h-100 p-0">
             <div className='d-flex flex-wrap align-items-center h-100 px-2 px-sm-4 px-md-5'>
               <div className="col">
                 <Img
-                  src={Image?.CompanyLogo}
+                  src={Image?.AppliedLogo}
                   className="cursor-pointer"
-                  width="60rem"
-                  height="37rem"
+                  width="120rem"
+                  height="23rem"
                   clickFunction={logoRedirect ? () => navigate(logoRedirect) : null}
                 />
               </div>

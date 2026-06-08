@@ -318,7 +318,7 @@ const commonSlice = createSlice({
                     modal_type: "submit_confirmation",
                     modalShow: true,
                     modal_close_btn: false,
-                    enable_lg_autoScroll: true
+                    enable_lg_autoScroll: false
                 });
             })
             .addCase(submitTestResponse, (state) => {
@@ -332,7 +332,7 @@ const commonSlice = createSlice({
                     modal_type: "test_completed",
                     modalShow: true,
                     modal_close_btn: false,
-                    enable_lg_autoScroll: true,
+                    enable_lg_autoScroll: false,
                     test_over_logout: 'test_completed'
                 });
             })

@@ -139,7 +139,7 @@ const AdminSlice = createSlice({
                     break;
 
                 case "response":
-                    state.campaigns_data.campaign = state.campaigns_data.campaign.filter(item => item._id != data._id)
+                    state.campaigns_data.campaign = state.campaigns_data.campaign.filter(item => item._id !== data._id)
                     state.delete_campaign_spinner = false;
                     state.create_campaign = {}
                     break;
@@ -335,9 +335,14 @@ const AdminSlice = createSlice({
                 const { type, data } = action.payload;
 
                 if (type === 'create_campaign' && data) {
-                    const date = new Date(data?.interview_date);
-                    const formatted = date.toISOString().split("T")[0];
-                    state.create_campaign = { ...data, interview_date: formatted } || {};
+                    const formattedData = { ...data };
+
+                    if (data?.interview_date) {
+                        const date = new Date(data?.interview_date);
+                        formattedData.interview_date = date.toISOString().split("T")[0];
+                    }
+
+                    state.create_campaign = formattedData || {};
                 }
             })
 

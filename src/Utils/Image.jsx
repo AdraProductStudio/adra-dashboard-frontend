@@ -1,4 +1,5 @@
 
+const AppliedLogo = require('Assets/Images/Applied-logo.png');
 const CompanyLogo = require('Assets/Images/company_logo.png');
 const CampainEmpty = require('Assets/Images/Task_empty.png');
 const CandidatesNotFound = require('Assets/Images/Group 1261156335.png');
@@ -12,7 +13,8 @@ const Image = {
     CandidatesNotFound,
     testImage,
     testCompletedImage,
-    Task_empty
+    Task_empty,
+    AppliedLogo
 }
 
 export default Image; 

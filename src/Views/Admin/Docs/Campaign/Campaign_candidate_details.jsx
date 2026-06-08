@@ -29,8 +29,8 @@ const Campaign_candidate_details = () => {
             <Fragment>
                 <div className="campaign_header border-bottom">
                     <div className="w-70">
-                        <ButtonComponent type="button" buttonName="Back" className="btn btn-outline-dark mb-2" clickFunction={() => navigate(`/dashboard/interview/${campaign_id}`)} />
-                        <h6 className='mb-0'>{adminState?.campaign_candidate_details?.name || ''} full details</h6>
+                        <ButtonComponent type="button" buttonName="Back" className="btn btn-outline-secondary mb-2" clickFunction={() => navigate(`/dashboard/interview/${campaign_id}`)} />
+                        <h6 className='mb-0 mt-2'>{adminState?.campaign_candidate_details?.name || ''} full details</h6>
                     </div>
                 </div>
                 <div className="campaign_detail_body">

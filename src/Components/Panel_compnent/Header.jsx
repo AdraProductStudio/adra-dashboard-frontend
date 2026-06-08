@@ -2,33 +2,25 @@ import React, { Fragment } from 'react';
 import ButtonComponent from 'Components/Button/Button';
 import HeaderCard from 'Components/Card/HeaderCard';
 import Icons from 'Utils/Icons';
+import { CiLogout } from 'react-icons/ci';
 
 const Header = ({
   offcanvasOn,
   offcanvasOnButton,
-  dispatch,
-  navigate
+  logoutClickFunction
 }) => {
-
 
   const headerContentFunc = () => {
     return <Fragment>
       <div className="col-sm-8 d-flex flex-wrap align-items-center justify-content-end">
-        <div className="header-icon-tag-width">
+        <div>
           <ButtonComponent
             type="button"
-            clickFunction={offcanvasOnButton}
-            className={'header-icon-width'}
-            buttonName={Icons?.notificationIcon}
-          />
-        </div>
-
-        <div className="header-icon-tag-width">
-          <ButtonComponent
-            type="button"
-            clickFunction={offcanvasOnButton}
-            className={'header-icon-width'}
-            buttonName={Icons?.profileDefautUserIcon}
+            clickFunction={logoutClickFunction}
+            className={'btn-outline-danger px-3 py-2 d-none d-xl-block'}
+              buttonName={<>
+              <CiLogout className='fs-4' /> Logout
+            </>}
           />
         </div>
 
@@ -37,6 +29,7 @@ const Header = ({
             <div className={`d-inline-block header-icon-tag-width ${offcanvasOn !== '' ? `d-${offcanvasOn}-none` : 'd-none'}`}>
               <ButtonComponent
                 type="button"
+                className="border border-secondary-subtle"
                 clickFunction={offcanvasOnButton}
                 buttonName={Icons?.profileDefautUserIcon}
               />

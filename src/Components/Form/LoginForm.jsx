@@ -62,7 +62,7 @@ const LoginForm = () => {
 
             <ButtonComponent
                 type="button"
-                className="btn-md btn-dark w-100"
+                className="btn-md btn-brand w-100"
                 clickFunction={handleSubmit}
                 title="Login"
                 buttonName={commonState?.buttonSpinner ?
@@ -72,10 +72,10 @@ const LoginForm = () => {
                 }
                 btnDisable={commonState?.buttonSpinner}
             />
-
-            <div className="text-end">
+            <p className='text-center mt-3 mb-0'>or</p>
+            <div className="text-center">
                 <LinkComponent
-                    className="mt-3 d-inline-block mb-0"
+                    className="mt-3 d-inline-block mb-0 btn btn-secondary w-100"
                     to='/candidates_registration'
                     title="Register as a candidate"
                 />

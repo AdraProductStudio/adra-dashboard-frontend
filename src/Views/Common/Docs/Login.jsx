@@ -13,13 +13,12 @@ const Login = () => {
             <div className="card-body p-3 p-md-4 p-xl-5 py-5">
               <div className="text-center mb-3">
                 <Img
-                  src={Image.CompanyLogo}
+                  src={Image.AppliedLogo}
                   alt="modelrocket-logo"
-                  width="90rem"
-                  height="60rem"
+                  width="150rem"
+                  height="28rem"
                 />
 
-                <p>Adra Product Studio</p>
               </div>
 
               <LoginForm />

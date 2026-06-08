@@ -18,7 +18,8 @@
   --sidebar-background-color: #ffffff;
   --sidebar-border: 0px solid rgba(236, 236, 236, 0.88);
 
-  --btn-brand-bg-color: black;
+  /* --btn-brand-bg-color: black; */
+  --btn-brand-bg-color: #0C78BC;
   --btn-brand-border-color: black;
   --btn-brand-color: white;
 
@@ -36,7 +37,8 @@
   --home-main-content-bg: #F1F1FF;
   --home-main-content-padding: 3rem 0 3rem 0;
 
-  --main-background-color: #f9f9f9;
+  /* --main-background-color: #f9f9f9; */
+  --main-background-color:#F0F4F8;
   --main-content-padding-y: .7rem 0rem .4rem 0rem;
 
   --page-main-content-padding-y: 1rem .2rem;
@@ -75,7 +77,7 @@ input::-webkit-inner-spin-button {
 
 ::-webkit-scrollbar-thumb {
   border-radius: 12px;
-  background: black;
+  background: #0C78BC;
   cursor: pointer;
 }
 
@@ -104,6 +106,19 @@ body {
   position: absolute;
   top: 3rem;
   right: 1.4rem;
+}
+
+.btn-brand,
+.btn-brand:hover,
+.btn-brand:active,
+.btn-brand:focus-visible {
+  background-color: #0C78BC !important;
+  border-color: #0C78BC !important;
+  color: #fff !important;
+}
+
+.btn-brand:focus-visible {
+  box-shadow: 0 0 0 .25rem rgba(12, 120, 188, .25) !important;
 }
 
 

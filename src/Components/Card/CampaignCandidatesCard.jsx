@@ -1,7 +1,7 @@
 import ButtonComponent from 'Components/Button/Button';
-import Img from 'Components/Img/Img'
-import React, { useEffect, useState } from 'react'
-import { Card } from 'react-bootstrap'
+import Img from 'Components/Img/Img';
+import React, { useEffect, useState } from 'react';
+import { Card } from 'react-bootstrap';
 import { PiClockCountdown } from "react-icons/pi";
 import { useDispatch } from 'ResuableFunctions/CustomHooks';
 import Icons from 'Utils/Icons';
@@ -16,16 +16,12 @@ const CampaignCandidatesCard = ({
     const dispatch = useDispatch();
 
     function apti_status(status) {
-        if (status === "Test Completed") {
-            return <span className='text-success'>Test Completed</span>
-        } else if (status === "Not Started") {
-            return <span className='text-danger'>Not Started</span>
-        } else if (status === "Test Started") {
-            return <span className='text-warning'>Test Started</span>
-        }
-        else if (status === "malpractice") {
-            return <span className='text-danger'>Malpractice</span>
-        }
+        if (status === "Test Completed") return "Test Completed";
+        else if (status === "Not Started") return "Not Started";
+        else if (status === "Test Started") return "Test Started";
+        else if (status === "malpractice") return "Malpractice";
+
+        return "Unknown Status";
     }
 
     function apti_status_colors(status) {
@@ -33,12 +29,14 @@ const CampaignCandidatesCard = ({
         else if (status === "Not Started") return 'test_not_started_badge';
         else if (status === "Test Started") return 'test_progress_badge';
         else if (status === "malpractice") return 'test_not_started_badge';
+
+        return 'test_progress_badge';
     }
 
     useEffect(() => {
         const calculateTimeLeft = () => {
             const testStartedOn = new Date(data?.test_EndedOn);
-            const testEndsOn = new Date(testStartedOn.getTime()); // 1 hour later
+            const testEndsOn = new Date(testStartedOn.getTime());
             const now = new Date();
             const timeLeftMs = testEndsOn - now;
 
@@ -51,13 +49,10 @@ const CampaignCandidatesCard = ({
             }
         };
 
-        // Initial calculation
         calculateTimeLeft();
 
-        // Update every second
         const timer = setInterval(calculateTimeLeft, 1000);
 
-        // Cleanup timer on unmount
         return () => clearInterval(timer);
     }, [data?.test_EndedOn]);
 
@@ -67,10 +62,10 @@ const CampaignCandidatesCard = ({
         const { scored } = Object.values(score).reduce(
             (acc, val) => {
                 if (typeof val === "string") {
-                    // case: "6 out of 15"
                     const match = val.match(/(\d+)\s*out of\s*(\d+)/i);
                     if (match) {
-                        const [_, s, t] = match.map(Number);
+                        const s = Number(match[1]);
+                        const t = Number(match[2]);
                         return {
                             scored: acc.scored + (s || 0),
                             total: acc.total + (t || 0),
@@ -78,7 +73,6 @@ const CampaignCandidatesCard = ({
                     }
                 }
                 else if (typeof val === "number") {
-                    // case: number only (unknown total)
                     return {
                         scored: acc.scored + val,
                         total: acc.total,
@@ -92,174 +86,217 @@ const CampaignCandidatesCard = ({
         return scored;
     }
 
+    const showTimer = data?.status !== "Test Completed" && timeLeft !== "Test time is over" && data?.status !== "malpractice";
+    const scoreValue = test_score(data?.test_score);
+
+    const cardStyles = {
+        border: '1px solid #E7EDF3',
+        background: 'linear-gradient(180deg, #FFFFFF 0%, #F8FBFF 100%)'
+    };
+
+    const headerStyles = {
+        background: 'linear-gradient(145deg, #F7FAFC 0%, #EEF5FF 55%, #F9FBFF 100%)'
+    };
+
+    const avatarWrapStyles = {
+        width: detail_view ? '8.5rem' : '6.9rem',
+        height: detail_view ? '8.5rem' : '6.9rem',
+        borderRadius: '28px',
+        padding: detail_view ? '0.4rem' : '0.3rem',
+        background: 'linear-gradient(135deg, rgba(37, 99, 235, 0.18), rgba(15, 23, 42, 0.06))',
+        boxShadow: '0 18px 38px rgba(15, 23, 42, 0.10)'
+    };
+
+    const quickMeta = [data?.gender, data?.age].filter(Boolean);
+    const contactData = [
+        { icon: Icons.mailIcon, value: data?.email || '-', label: 'Email' },
+        { icon: Icons.locationIcon, value: data?.address || '-', label: 'Location' },
+        { icon: Icons.phoneIcon, value: data?.phoneNumber || '-', label: 'Phone' },
+        { icon: Icons.qualificationIcon, value: data?.candidateQualification || '-', label: 'Qualification' }
+    ];
+    const detailData = [
+        { label: 'Current salary', value: data?.currentSalary || "-" },
+        { label: 'Expected salary', value: data?.expectedSalary || "-" },
+        { label: 'Marital status', value: data?.maritalStatus || "-" },
+        { label: 'Total Experience', value: data?.canditateExpType || "-" },
+        { label: 'Previous Company Name', value: data?.previousCompanyName || "-" },
+        { label: 'Parent Occupation', value: data?.parentOccupation || "-" },
+        { label: 'School (SSLC)', value: data?.sslcSchoolName || "-" },
+        { label: 'SSLC Marks', value: data?.sslcMarks || "-" },
+        { label: 'School (HSC)', value: data?.hscSchoolName || "-" },
+        { label: 'HSC Marks', value: data?.hscMarks || "-" },
+        { label: 'College Name', value: data?.collegeName || "-" },
+        { label: 'College Marks', value: data?.collegeMarks || "-" }
+    ];
+
     return (
-        <Card className={`bg-white shadow-sm border-0 rounded-4 h-100 position-relative ${card_className || ''}`}>
-            <Card.Title className="text-center mt-5">
-                <Img src={data?.profile_photo_path ? `${process.env.REACT_APP_CDN_URL}${data?.profile_photo_path}` : "https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png"} alt="Fellowship Candidate" className="fellowship_candidate_image" />
-            </Card.Title>
-            <div className={`interview_candidate_badge ${apti_status_colors(data?.status || '')}`}>
-                {apti_status(data?.status || '')}
-            </div>
-            <Card.Body className='pb-0'>
-                <div className='row align-items-start border-bottom'>
-                    <div className={detail_view ? "col-12 text-center" : "col-10 ps-3"}>
-                        <h6>
-                            <span className='border-end pe-2'>{data?.name || ''}</span>
-                            {data?.experience && <span className='ps-2'>{data?.experience || ''}</span>}
-                        </h6>
+        <Card
+            className={`campaign-candidate-card border-0 shadow-sm rounded-4 h-100 position-relative ${detail_view ? 'campaign-candidate-card--detail' : 'overflow-hidden'} ${card_className || ''}`}
+            style={cardStyles}
+        >
+            <div className="campaign-candidate-card__accent" />
 
-                        <p>
-                            {data?.gender && <span className='border-end pe-2'>{data?.gender || ''}</span>}
-                            {data?.age && <span className='ps-2'>{data?.age || ''}</span>}
-                        </p>
-
-                        {data?.status !== "Test Completed" && timeLeft !== "Test time is over" && data?.status !== "malpractice" ?
-                            <p>
-                                <PiClockCountdown size={22} />
-                                <span className='ps-2'>{timeLeft}</span>
-                            </p>
-                            :
-                            null
-                        }
-                        {timeLeft === "Test time is over" || data?.status === "Test Completed" || data?.status === "malpractice" ? (
-                            <p>
-                                Test Score:{" "}
-                                {test_score(data?.test_score)}
-                            </p>
-                        ) : null}
-
+            <Card.Header className='border-0 px-3 px-xl-4 pt-3 pb-3 position-relative' style={headerStyles}>
+                <div className="d-flex justify-content-between align-items-start gap-2 mb-2">
+                    <div className={`interview_candidate_badge ${apti_status_colors(data?.status || '')}`}>
+                        {apti_status(data?.status || '')}
                     </div>
-                    {!detail_view && <div className="col-2">
+
+                    {!detail_view && (
                         <ButtonComponent
                             type="button"
                             buttonName={Icons.deleteIcon}
-                            className="btn text-center"
+                            className="btn campaign-candidate-card__action-btn ms-auto"
                             clickFunction={() => dispatch(updateOverallModalData({ size: 'md', from: 'admin', type: 'delete_candidate', data: data }))}
                         />
-                    </div>
-                    }
+                    )}
                 </div>
 
-                {detail_view && data?.test_score &&
-                    <div className='py-3'>
-                        <h5>Marks scored</h5>
-                        <ul className='m-0'>
+                <div className={`campaign-candidate-card__hero ${detail_view ? 'campaign-candidate-card__hero--detail' : ''}`}>
+                    <div className={`campaign-candidate-card__identity ${detail_view ? 'campaign-candidate-card__identity--detail' : ''}`}>
+                        <div className="flex-shrink-0" style={avatarWrapStyles}>
+                            <Img
+                                src={data?.profile_photo_path ? `${process.env.REACT_APP_CDN_URL}${data?.profile_photo_path}` : "https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png"}
+                                alt="Fellowship Candidate"
+                                className="fellowship_candidate_image campaign-candidate-card__image"
+                            />
+                        </div>
+
+                        <div className={`flex-grow-1 ${detail_view ? 'w-100' : ''}`}>
+                            <div className={`d-flex ${detail_view ? 'flex-column align-items-center' : 'flex-wrap align-items-center'} gap-2 mb-2`}>
+                                <h5 className='mb-0 fw-semibold text-dark campaign-candidate-card__title' style={{ overflowWrap: 'anywhere' }}>
+                                    {data?.name || 'Unnamed Candidate'}
+                                </h5>
+                                {!detail_view && data?.experience && (
+                                    <span className='campaign-candidate-card__meta-pill'>
+                                        {data?.experience}
+                                    </span>
+                                )}
+                            </div>
+
+                            {quickMeta.length ? (
+                                <div className={`d-flex ${detail_view ? 'justify-content-center' : ''} flex-wrap gap-2 mb-2`}>
+                                    {quickMeta.map((item, index) => (
+                                        <span className='campaign-candidate-card__meta-chip' key={index}>
+                                            {item}
+                                        </span>
+                                    ))}
+                                </div>
+                            ) : null}
+
+                            {!detail_view && (
+                                <div className='campaign-candidate-card__subtitle text-secondary'>
+                                    Candidate profile overview
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className={`campaign-candidate-card__status-panel ${detail_view ? 'mx-auto campaign-candidate-card__status-panel--detail' : ''}`}>
+                        {showTimer ? (
+                            <div className='d-flex align-items-start gap-2 text-dark'>
+                                <div className='campaign-candidate-card__status-icon'>
+                                    <PiClockCountdown size={18} className='flex-shrink-0 text-primary' />
+                                </div>
+                                <div>
+                                    <div className='campaign-candidate-card__eyebrow'>Assessment window</div>
+                                    <div className='campaign-candidate-card__status-value'>{timeLeft}</div>
+                                    <div className='campaign-candidate-card__status-note'>Candidate can still complete the test</div>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className='campaign-candidate-card__score-panel'>
+                                <div className='campaign-candidate-card__eyebrow'>Test score</div>
+                                <div className='campaign-candidate-card__score-value'>{scoreValue}</div>
+                                <div className='campaign-candidate-card__status-note'>
+                                    {data?.status === "malpractice" ? 'Candidate flagged during assessment' : 'Assessment closed'}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </Card.Header>
+
+            <Card.Body className='px-3 px-xl-4 pt-3 pb-0'>
+                {detail_view && data?.test_score && (
+                    <div className='campaign-candidate-card__section mb-3'>
+                        <div className='d-flex justify-content-between align-items-center gap-2 mb-3'>
+                            <h6 className='mb-0 fw-semibold text-dark'>Marks scored</h6>
+                            <span className='campaign-candidate-card__score-total'>
+                                Total: {scoreValue}
+                            </span>
+                        </div>
+
+                        <ul className='list-unstyled m-0 d-grid gap-2'>
                             {Object.entries(data?.test_score || {}).map(([key, value], index) => (
-                                <li key={index}>{key}: {value}</li>
+                                <li className='campaign-candidate-card__marks-row' key={index}>
+                                    <span className='fw-medium text-dark'>{key}</span>
+                                    <span className='text-secondary'>{value}</span>
+                                </li>
                             ))}
                         </ul>
                     </div>
-                }
+                )}
 
-                {/* {!detail_view && ( */}
-                <div className="pt-3" onClick={!detail_view ? clickFunction : null}>
-                    <table className='table table-borderless m-0'>
-                        <tbody>
-                            <tr>
-                                <td className='col-1'>
-                                    {Icons.mailIcon}
-                                </td>
-                                <td className='text-break'>{data?.email || ''}</td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    {Icons.locationIcon}
-                                </td>
-                                <td className='text-break'>{data?.address || ''}</td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    {Icons.phoneIcon}
-                                </td>
-                                <td className='text-break'>{data?.phoneNumber || ''}</td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    {Icons.qualificationIcon}
-                                </td>
-                                <td className='text-break'>{data?.candidateQualification || ''}</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <div
+                    className={`campaign-candidate-card__section ${!detail_view ? 'campaign-candidate-card__clickable-section' : ''} pt-0`}
+                    onClick={!detail_view ? clickFunction : null}
+                >
+                    <div className='campaign-candidate-card__section-head'>
+                        <h6 className='mb-0 fw-semibold text-dark'>{detail_view ? 'Contact details' : 'Quick details'}</h6>
+                    </div>
+                    <div className='d-grid gap-2'>
+                        {contactData.map((item, index) => (
+                            <div className='campaign-candidate-card__info-row' key={index}>
+                                <div className='campaign-candidate-card__info-icon'>
+                                    {item.icon}
+                                </div>
+                                <div className='flex-grow-1' style={{ minWidth: 0 }}>
+                                    <div className='campaign-candidate-card__eyebrow mb-1'>{item.label}</div>
+                                    <div className='text-break text-dark'>{item.value}</div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
                 </div>
-                {/* )} */}
             </Card.Body>
 
-            <Card.Footer className='border-0 bg-transparent'>
+            <Card.Footer className='border-0 bg-transparent px-3 px-xl-4 pt-3 pb-3 pb-xl-4'>
                 {!detail_view && (
-                    <table className={`table table-borderless m-0 ${detail_view ? 'border-top' : ''}`}>
-                        <tbody className='text-center'>
-                            <tr>
-                                <th className='border-end'>Current salary</th>
-                                <th>Expected salary</th>
-                            </tr>
-                            <tr>
-                                <td className='border-end'>{data?.currentSalary || ''}</td>
-                                <td>{data?.expectedSalary || ''}</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div className='row g-2'>
+                        <div className='col-6'>
+                            <div className='campaign-candidate-card__salary-box h-100'>
+                                <div className='campaign-candidate-card__eyebrow mb-1'>Current salary</div>
+                                <div className='fw-semibold text-dark text-break campaign-candidate-card__salary-value'>{data?.currentSalary || '-'}</div>
+                            </div>
+                        </div>
+                        <div className='col-6'>
+                            <div className='campaign-candidate-card__salary-box h-100'>
+                                <div className='campaign-candidate-card__eyebrow mb-1'>Expected salary</div>
+                                <div className='fw-semibold text-dark text-break campaign-candidate-card__salary-value'>{data?.expectedSalary || '-'}</div>
+                            </div>
+                        </div>
+                    </div>
                 )}
 
                 {detail_view && (
-                    <div className="border-top py-3">
-                        <table className="table table-borderless">
-                            <tbody>
-                                <tr>
-                                    <th>Current salary</th>
-                                    <td>{data?.currentSalary || "-"}</td>
-                                </tr>
-                                <tr>
-                                    <th>Expected salary</th>
-                                    <td>{data?.expectedSalary || "-"}</td>
-                                </tr>
-                                <tr>
-                                    <th>Marital status</th>
-                                    <td>{data?.maritalStatus || "-"}</td>
-                                </tr>
-                                <tr>
-                                    <th>Total Experience</th>
-                                    <td>{data?.canditateExpType || "-"}</td>
-                                </tr>
-                                <tr>
-                                    <th>Previous Company Name</th>
-                                    <td>{data?.previousCompanyName || "-"}</td>
-                                </tr>
-                                <tr>
-                                    <th>Parent Occupation</th>
-                                    <td>{data?.parentOccupation || "-"}</td>
-                                </tr>
-                                <tr>
-                                    <th>School (SSLC)</th>
-                                    <td>{data?.sslcSchoolName || "-"}</td>
-                                </tr>
-                                <tr>
-                                    <th>SSLC Marks</th>
-                                    <td>{data?.sslcMarks || "-"}</td>
-                                </tr>
-                                <tr>
-                                    <th>School (HSC)</th>
-                                    <td>{data?.hscSchoolName || "-"}</td>
-                                </tr>
-                                <tr>
-                                    <th>HSC Marks</th>
-                                    <td>{data?.hscMarks || "-"}</td>
-                                </tr>
-                                <tr>
-                                    <th>College Name</th>
-                                    <td>{data?.collegeName || "-"}</td>
-                                </tr>
-                                <tr>
-                                    <th>College Marks</th>
-                                    <td>{data?.collegeMarks || "-"}</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <div className="campaign-candidate-card__section pt-3">
+                        <h6 className='mb-3 fw-semibold text-dark'>Additional details</h6>
+                        <div className="row g-2">
+                            {detailData.map((item, index) => (
+                                <div className="col-12 col-xl-6" key={index}>
+                                    <div className='campaign-candidate-card__detail-box h-100'>
+                                        <div className='campaign-candidate-card__eyebrow mb-1'>{item.label}</div>
+                                        <div className='text-dark text-break'>{item.value}</div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 )}
             </Card.Footer>
-        </Card >
-    )
-}
+        </Card>
+    );
+};
 
-export default CampaignCandidatesCard
+export default CampaignCandidatesCard;

@@ -145,15 +145,15 @@ const InterviewCandidatesHome = () => {
     }, [interviewState?.test_end_timeStamp, commonState?.involved_in_tab_switching, commonState?.test_over_logout])
 
     return (
-        <div className='overflow-hidden'>
+        <div className='overflow-hidden applied_brand_color '>
             <InterviewCandidatesHeader />
             {
                 interviewState?.isDataPresentInIndexedDb ?
-                    <section className='main'>
+                    <section className='main text-dark'>
                         <div className="h-100 d-flex flex-wrap p-5">
                             <div className="col-3 d-flex flex-column">
                                 <Card className='h-100 border-0 shadow-sm rounded-3'>
-                                    <Card.Header>
+                                    <Card.Header className='bg-white text-dark'>
                                         <h5 className='mb-0 py-2'>Number of Questions</h5>
                                     </Card.Header>
                                     <Card.Body>
@@ -161,7 +161,7 @@ const InterviewCandidatesHome = () => {
                                             {interviewState?.generatedQuestions?.map((question, questionInd) => (
                                                 <div className="col-2 my-2" key={questionInd}>
                                                     <ButtonComponent
-                                                        className={`question_number_btn p-1 ${question?.candidate_answer ? "questions_answerd" : questionInd === interviewState?.selectedQuestionIndex ? "active" : ""}`}
+                                                        className={`question_number_btn p-1 ${question?.candidate_answer ? "questions_answerd" : ""} ${questionInd === interviewState?.selectedQuestionIndex ? "active" : ""}`}
                                                         buttonName={questionInd + 1}
                                                         clickFunction={() => dispatch(updateSelectedQuestionIndex(questionInd))}
                                                     />
@@ -174,7 +174,7 @@ const InterviewCandidatesHome = () => {
 
                             <div className="col-9 px-2">
                                 <Card className='h-100 border-0 shadow-sm rounded-3'>
-                                    <Card.Header>
+                                    <Card.Header className='bg-white text-dark'>
                                         <h5 className='mb-0 py-2'>Questions</h5>
                                     </Card.Header>
                                     <Card.Body>
@@ -227,7 +227,7 @@ const InterviewCandidatesHome = () => {
                                     <Card.Footer className='py-4 bg-transparent border-0 d-flex flex-wrap'>
                                         <div className="col">
                                             <ButtonComponent
-                                                className="btn-secondary px-5"
+                                                className="btn-brand px-5"
                                                 buttonName="Previous"
                                                 clickFunction={() => dispatch(updateSelectedQuestionIndex(interviewState?.selectedQuestionIndex - 1))}
                                                 btnDisable={interviewState?.selectedQuestionIndex === 0}
@@ -235,7 +235,7 @@ const InterviewCandidatesHome = () => {
                                         </div>
                                         <div className="col text-end">
                                             <ButtonComponent
-                                                className="btn-secondary px-5"
+                                                className="btn-brand px-5"
                                                 buttonName={interviewState?.generatedQuestions?.length - 1 <= interviewState?.selectedQuestionIndex ? "Submit" : "Next"}
                                                 clickFunction={interviewState?.generatedQuestions?.length - 1 <= interviewState?.selectedQuestionIndex ?
                                                     () => dispatch(handleCloseTestManual)

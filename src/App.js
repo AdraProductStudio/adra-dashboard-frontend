@@ -38,10 +38,10 @@ const App = () => {
           {/* Admin view */}
           <Route path="dashboard" element={<AdminAuth />}>
             <Route element={<Layout />}>
-              <Route path="home" element={<p>hi</p>} />
+              {/* <Route path="home" element={<p>hi</p>} />
               <Route path="employees" element={<p>employees</p>} />
               <Route path="attendance" element={<p>attendance</p>} />
-              <Route path="payroll" element={<p>payroll</p>} />
+              <Route path="payroll" element={<p>payroll</p>} /> */}
 
               <Route path="interview">
                 <Route index element={<Campaign />} />
@@ -50,14 +50,14 @@ const App = () => {
                 <Route path=":campaign_id/:candidate_id" element={<Campaign_candidate_details />} />
               </Route>
 
-              <Route path="circular" element={<p>circular</p>} />
+              {/* <Route path="circular" element={<p>circular</p>} />
               <Route path="invoices" element={<p>invoices</p>} />
               <Route path="notes" element={<p>notes</p>} />
               <Route path="documents" element={<p>documents</p>} />
               <Route path="fellowship_candidates" >
                 <Route index element={<Fellowship />} />
                 <Route path=":fellowship_candidate_id" element={<FellowshipDetails />} />
-              </Route>
+              </Route> */}
             </Route>
           </Route>
 

@@ -21,8 +21,8 @@ const Sample_test = () => {
         <Fragment>
             <div className="campaign_header border-bottom">
                 <div className="w-70">
-                    <ButtonComponent type="button" buttonName="Back" className="btn btn-outline-dark mb-2" clickFunction={() => navigate(`/dashboard/interview/${campaign_id}`)} />
-                    <h6 className='mb-0'>{adminState?.sample_test?.job_title || ''} campaign</h6>
+                    <ButtonComponent type="button" buttonName="Back" className="btn btn-outline-secondary mb-2" clickFunction={() => navigate(`/dashboard/interview/${campaign_id}`)} />
+                    <h6 className='mb-0 mt-2'>{adminState?.sample_test?.job_title || ''} campaign</h6>
                 </div>
             </div>
             <div className="campaign_detail_body">
