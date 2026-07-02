@@ -1,6 +1,6 @@
 import axiosInstance from "Services/axiosInstance";
 import { handleValidation } from "Views/Common/Action/Common_action";
-import { closeTestMode, malpracticeTestClose, updateMalpracticeData, updateToast } from "Views/Common/Slice/Common_slice";
+import { closeTestMode, malpracticeTestClose, resetModalBox, updateMalpracticeData, updateOverallModalData, updateToast } from "Views/Common/Slice/Common_slice";
 import {
     updateCandidateData,
     registerCandidateRequest,
@@ -11,12 +11,16 @@ import {
     getQuestionsFailure,
     updateAnswers,
     submitTestByManual,
+    submitFirstAssessmentResponse,
     submitTestRequest,
     submitTestResponse,
     submitTestFailure,
     submitTestRequestSpinner,
     updateTimeOverCloseTest,
-    getRegistrationRoles
+    getRegistrationRoles,
+    programmingTestStart,
+    programmingTestSubmit,
+    programmingTestEvaluate
 
 } from "Views/InterviewCandidates/Slice/interviewSlice";
 import { IndexedDbDeleteFun } from "Views/InterviewCandidates/IndexedDbDeleteFun";
@@ -177,7 +181,7 @@ export const handleCloseTestManual = dispatch => {
     dispatch(submitTestByManual())
 }
 
-export const handleCloseTestEndpoint = candidate_answers => async dispatch => {
+export const handleCloseTestEndpoint = (candidate_answers, navigate) => async dispatch => {
     try {
         let sendCandidateAnswers = []
         for (let i = 0; i < candidate_answers?.length; i++) {
@@ -187,8 +191,10 @@ export const handleCloseTestEndpoint = candidate_answers => async dispatch => {
         dispatch(submitTestRequestSpinner())
         const { data } = await axiosInstance.post("/validate_answers", { close: 'automatic', candidate_answers: sendCandidateAnswers })
         if (data?.error_code === 0) {
-            dispatch(submitTestResponse())
+            dispatch(submitFirstAssessmentResponse())
+            dispatch(resetModalBox())
             IndexedDbDeleteFun();
+            if (navigate) navigate("/candidates_home/programming-preparation", { replace: true });
         }
         else dispatch(submitTestFailure(data?.message))
     }
@@ -205,5 +211,112 @@ export const handleUpdateMalpractice = (params) => async (dispatch) => {
         }
     } catch (err) {
         console.error(err);
+    }
+}
+
+export const handleStartProgrammingTest = () => async (dispatch) => {
+    try {
+        dispatch(programmingTestStart({ type: "request" }));
+        const { data } = await axiosInstance.post("/programming-test/start");
+
+        if (data?.error_code === 0) {
+            dispatch(programmingTestStart({ type: "response", data: data?.data || {} }));
+            return data?.data || {};
+        }
+
+        dispatch(programmingTestStart({ type: "failure", message: data?.message }));
+        dispatch(updateToast({ message: data?.message || "Unable to start programming assessment", type: "error" }));
+        return null;
+    } catch (Err) {
+        const message = Err?.message || "Unable to start programming assessment";
+        dispatch(programmingTestStart({ type: "failure", message }));
+        dispatch(updateToast({ message, type: "error" }));
+        return null;
+    }
+}
+
+export const handleSubmitProgrammingTest = (params) => async (dispatch) => {
+    try {
+        dispatch(programmingTestSubmit({ type: "request" }));
+        const { data } = await axiosInstance.post("/programming-test/submit", params);
+
+        if (data?.error_code === 0) {
+            dispatch(programmingTestSubmit({ type: "response", data: data?.data || {} }));
+            dispatch(updateOverallModalData({
+                size: 'xl',
+                from: 'interview_candidate',
+                type: 'test_completed',
+                enable_lg_autoScroll: false
+            }));
+            dispatch(handleEvaluateProgrammingTest({ silent: true }));
+            return data?.data || {};
+        }
+
+        dispatch(programmingTestSubmit({ type: "failure", message: data?.message }));
+        dispatch(updateToast({ message: data?.message || "Unable to submit programming test", type: "error" }));
+        return null;
+    } catch (Err) {
+        const message = Err?.message || "Unable to submit programming test";
+        dispatch(programmingTestSubmit({ type: "failure", message }));
+        dispatch(updateToast({ message, type: "error" }));
+        return null;
+    }
+}
+
+export const handleCloseProgrammingTestMalpractice = (params) => async (dispatch) => {
+    try {
+        exitFullScreen();
+        dispatch(malpracticeTestClose());
+        dispatch(programmingTestSubmit({ type: "request" }));
+
+        const { data } = await axiosInstance.post("/programming-test/submit", { ...params, close: "malpractice" });
+
+        if (data?.error_code === 0) {
+            dispatch(programmingTestSubmit({ type: "response", data: data?.data || {} }));
+            return data?.data || {};
+        }
+
+        dispatch(programmingTestSubmit({ type: "failure", message: data?.message }));
+        dispatch(updateToast({ message: data?.message || "Unable to submit programming test", type: "error" }));
+        return null;
+    } catch (Err) {
+        const message = Err?.message || "Unable to submit programming test";
+        dispatch(programmingTestSubmit({ type: "failure", message }));
+        dispatch(updateToast({ message, type: "error" }));
+        return null;
+    }
+}
+
+export const handleEvaluateProgrammingTest = ({ silent = false } = {}) => async (dispatch) => {
+    try {
+        dispatch(programmingTestEvaluate({ type: "request" }));
+        const { data } = await axiosInstance.post("/programming-test/evaluate");
+
+        if (data?.error_code === 0) {
+            dispatch(programmingTestEvaluate({ type: "response", data: data?.data || {} }));
+            if (!silent) {
+                dispatch(updateToast({ message: data?.message || "Programming test evaluated successfully", type: "success" }));
+            }
+            return data?.data || {};
+        }
+
+        dispatch(programmingTestEvaluate({ type: "failure", data: data?.data || {}, message: data?.message }));
+        if (!silent) {
+            dispatch(updateToast({
+                message: "Your solution has been submitted successfully. The evaluation is currently unavailable and will be processed shortly.",
+                type: "error"
+            }));
+        }
+        return data?.data || null;
+    } catch (Err) {
+        const message = Err?.message || "Evaluation unavailable";
+        dispatch(programmingTestEvaluate({ type: "failure", message }));
+        if (!silent) {
+            dispatch(updateToast({
+                message: "Your solution has been submitted successfully. The evaluation is currently unavailable and will be processed shortly.",
+                type: "error"
+            }));
+        }
+        return null;
     }
 }

@@ -15,7 +15,21 @@ const interviewSlice = createSlice({
         answeredQuestionPercentage: 0,
         test_end_timeStamp: Cookies.get('log') ? decryptData(Cookies.get('log'))?.testEndOn : '',
         calculate_remaining_time: null,
-        submit_test: false
+        submit_test: false,
+        programming_test: {
+            start_spinner: false,
+            submit_spinner: false,
+            evaluate_spinner: false,
+            test_started_on: null,
+            duration: 300,
+            remaining_seconds: null,
+            status: null,
+            submit_status: null,
+            evaluation_status: null,
+            evaluation: null,
+            evaluation_error_message: '',
+            questions: []
+        }
     },
     reducers: {
         updateCandidateData(state, action) {
@@ -175,6 +189,23 @@ const interviewSlice = createSlice({
                 submit_test: false
             }
         },
+        submitFirstAssessmentResponse(state, action) {
+            let decrypt_cookie = Cookies.get('log') ? decryptData(Cookies.get('log')) : {};
+            delete decrypt_cookie.testEndOn;
+            Cookies.set('log', encryptData(decrypt_cookie));
+
+            return {
+                ...state,
+                buttonSpinner: false,
+                submit_test: false,
+                calculate_remaining_time: null,
+                test_end_timeStamp: null,
+                answeredQuestionPercentage: 0,
+                selectedQuestionIndex: 0,
+                generatedQuestions: [],
+                isDataPresentInIndexedDb: false
+            }
+        },
         submitTestFailure(state, action) {
             return {
                 ...state,
@@ -218,6 +249,88 @@ const interviewSlice = createSlice({
                     state.registration_roles = [];
                     break;
             }
+        },
+        programmingTestStart(state, action) {
+            const { type, data, message } = action.payload;
+
+            switch (type) {
+                case "request":
+                    state.programming_test.start_spinner = true;
+                    state.programming_test.evaluation_error_message = '';
+                    break;
+
+                case "response":
+                    state.programming_test.start_spinner = false;
+                    state.programming_test.test_started_on = data?.test_started_on || null;
+                    state.programming_test.duration = data?.duration || 300;
+                    state.programming_test.status = data?.status || null;
+                    state.programming_test.submit_status = ["Completed", "Malpractice"].includes(data?.status) ? "Completed" : null;
+                    state.programming_test.evaluation_status = data?.ai_evaluation?.status || null;
+                    state.programming_test.evaluation = data?.ai_evaluation || null;
+                    state.programming_test.questions = data?.questions || [];
+                    break;
+
+                case "failure":
+                    state.programming_test.start_spinner = false;
+                    state.programming_test.evaluation_error_message = message || '';
+                    break;
+
+                default:
+                    break;
+            }
+        },
+        updateProgrammingTestRemainingSeconds(state, action) {
+            state.programming_test.remaining_seconds = action.payload;
+        },
+        programmingTestSubmit(state, action) {
+            const { type, data, message } = action.payload;
+
+            switch (type) {
+                case "request":
+                    state.programming_test.submit_spinner = true;
+                    state.programming_test.evaluation_error_message = '';
+                    break;
+
+                case "response":
+                    state.programming_test.submit_spinner = false;
+                    state.programming_test.status = data?.status || "Completed";
+                    state.programming_test.submit_status = "Completed";
+                    break;
+
+                case "failure":
+                    state.programming_test.submit_spinner = false;
+                    state.programming_test.evaluation_error_message = message || '';
+                    break;
+
+                default:
+                    break;
+            }
+        },
+        programmingTestEvaluate(state, action) {
+            const { type, data, message } = action.payload;
+
+            switch (type) {
+                case "request":
+                    state.programming_test.evaluate_spinner = true;
+                    state.programming_test.evaluation_error_message = '';
+                    break;
+
+                case "response":
+                    state.programming_test.evaluate_spinner = false;
+                    state.programming_test.evaluation_status = data?.ai_evaluation?.status || "Completed";
+                    state.programming_test.evaluation = data?.ai_evaluation || null;
+                    break;
+
+                case "failure":
+                    state.programming_test.evaluate_spinner = false;
+                    state.programming_test.evaluation_status = "Failed";
+                    state.programming_test.evaluation = data?.ai_evaluation || null;
+                    state.programming_test.evaluation_error_message = message || "Evaluation unavailable";
+                    break;
+
+                default:
+                    break;
+            }
         }
 
     },
@@ -251,9 +364,14 @@ export const {
     submitTestByManual,
     submitTestRequest,
     submitTestResponse,
+    submitFirstAssessmentResponse,
     submitTestFailure,
     submitTestRequestSpinner,
-    getRegistrationRoles
+    getRegistrationRoles,
+    programmingTestStart,
+    updateProgrammingTestRemainingSeconds,
+    programmingTestSubmit,
+    programmingTestEvaluate
 
 } = actions;
 

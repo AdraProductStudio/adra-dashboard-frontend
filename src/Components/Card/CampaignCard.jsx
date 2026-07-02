@@ -14,6 +14,41 @@ const CampaignCard = ({
     clickFunction
 }) => {
     const dispatch = useDispatch();
+    const companyBadgeLabel = campaign?.company_flag === 'applied' ? 'Applied' : 'Adra';
+    const companyBadgeStyles = {
+        position: 'absolute',
+        top: '0.85rem',
+        right: '0.85rem',
+        zIndex: 1,
+        fontSize: '0.72rem',
+        fontWeight: 600,
+        lineHeight: 1.2,
+        padding: '0.28rem 0.58rem',
+        borderRadius: '999px',
+        whiteSpace: 'nowrap',
+        color: campaign?.company_flag === "applied" ? '#1D4ED8' : '#F3F4F6',
+        backgroundColor: campaign?.company_flag === "applied" ? '#DBEAFE' : '#272829'
+    };
+
+    const cardStyles = {
+        border: '1px solid #E9ECEF',
+        background: 'linear-gradient(180deg, #FFFFFF 0%, #FBFCFD 100%)'
+    };
+
+    const metaCardStyles = {
+        border: '1px solid #EEF1F4',
+        borderRadius: '18px',
+        backgroundColor: '#FFFFFF',
+        minHeight: '100%'
+    };
+
+    const iconWrapStyles = {
+        width: '2.75rem',
+        height: '2.75rem',
+        borderRadius: '14px',
+        backgroundColor: '#F6F8FA'
+    };
+
     const card_content = [
         {
             icon: Icons.campaign_calender_icon,
@@ -33,56 +68,87 @@ const CampaignCard = ({
     ]
 
     return (
-        <Card className='border-0 shadow-sm rounded-4 h-100'>
-            <Card.Header className='bg-transparent py-3 border-0 border-bottom row'>
-                <div className="col-8">
-                    <h6 className={placeholder ? "placeholder w-75 py-3 rounded" : ''}>{campaign?.job_title || ''}</h6>
-                </div>
-                {placeholder ? null :
-                    <div className="col-4 row justify-content-between">
-                        <ButtonComponent
-                            type="button"
-                            buttonName={Icons.editIcon}
-                            className="btn col-5 text-center"
-                            clickFunction={() => dispatch(updateOverallModalData({ size: 'md', from: 'admin', type: 'create_campaign', data: campaign }))}
-                        />
+        <Card className='border-0 shadow-sm rounded-4 h-100 overflow-hidden position-relative' style={cardStyles}>
+            <Card.Header className='bg-transparent border-0 px-3 px-xl-4 pt-4 pb-2'>
+                {/* {
+                    placeholder ? null :
+                        <span style={companyBadgeStyles}>
+                            {companyBadgeLabel}
+                        </span>
+                } */}
+                <div className="d-flex flex-wrap justify-content-between align-items-start gap-3">
+                    <div className="flex-grow-1 pe-md-3">
+                        <h6
+                            className={placeholder ? "placeholder w-75 py-3 rounded mb-2" : 'mb-2 fw-semibold text-dark lh-sm'}
+                            style={{ overflowWrap: 'anywhere' }}
+                        >
+                            {campaign?.job_title || ''}
+                        </h6>
 
-                        <ButtonComponent
-                            type="button"
-                            buttonName={Icons.deleteIcon}
-                            className="btn col-5 text-center"
-                            clickFunction={() => dispatch(updateOverallModalData({ size: 'md', from: 'admin', type: 'delete_campaign', data: campaign }))}
-                        />
-                    </div>
-                }
-                <p className={placeholder ? "placeholder w-50 py-3 rounded mb-0" : 'mb-0 text-secondary fs-13'}>
-                    Posted on :
-                    {
-                        campaign?.created_at || campaign?.createdAt ? IsoStringDateConverter(campaign?.created_at || campaign?.createdAt)?.date
-                            :
-                            ''
-                    }
-                </p>
-            </Card.Header>
-            <Card.Body className='row gy-3 cursor-pointer' onClick={clickFunction}>
-                {
-                    card_content.map((item, index) => (
-                        <div className="col-12 d-flex flex-wrap mb-4" key={index}>
-                            <div className={placeholder ? "placeholder w-75 py-2 rounded" : ''} style={{ width: '70%' }}>
-                                {placeholder ? null : item.icon}
-                                <span className='ps-2 text-secondary fs-14'>{placeholder ? '' : item.title}</span>
-                            </div>
-                            <div className={placeholder ? "placeholder col py-2 rounded ms-2" : 'col'}>
-                                <span>
+                        <p className={placeholder ? "placeholder w-50 py-2 rounded mb-0" : 'mb-0 text-secondary fs-13'}>
+                            Posted on :
+                            {
+                                campaign?.created_at || campaign?.createdAt ? IsoStringDateConverter(campaign?.created_at || campaign?.createdAt)?.date
                                     :
-                                    <span className={placeholder ? "placeholder w-50 rounded" : 'fs-14 ps-2'}>
-                                        {item.value}
-                                    </span>
-                                </span>
+                                    ''
+                            }
+                        </p>
+                    </div>
+
+                    {
+                        placeholder ? null :
+                            <div className="d-flex align-items-center gap-2 flex-shrink-0 ms-auto">
+                                <ButtonComponent
+                                    type="button"
+                                    buttonName={Icons.editIcon}
+                                    className="text-center d-inline-flex align-items-center justify-content-center rounded-circle border bg-white p-2"
+                                    clickFunction={() => dispatch(updateOverallModalData({ size: 'md', from: 'admin', type: 'create_campaign', data: campaign }))}
+                                />
+
+                                <ButtonComponent
+                                    type="button"
+                                    buttonName={Icons.deleteIcon}
+                                    className="text-center d-inline-flex align-items-center justify-content-center rounded-circle border bg-white p-2"
+                                    clickFunction={() => dispatch(updateOverallModalData({ size: 'md', from: 'admin', type: 'delete_campaign', data: campaign }))}
+                                />
                             </div>
-                        </div>
-                    ))
-                }
+                    }
+                </div>
+            </Card.Header>
+
+            <Card.Body className='px-3 px-xl-4 pb-3 pb-xl-4 pt-2'>
+                <div className="row g-3 cursor-pointer" onClick={clickFunction}>
+                    {
+                        card_content.map((item, index) => (
+                            <div className="col-12" key={index}>
+                                <div className="d-flex align-items-start gap-3 p-3" style={metaCardStyles}>
+                                    <div
+                                        className={placeholder ? "placeholder rounded" : 'd-inline-flex align-items-center justify-content-center flex-shrink-0'}
+                                        style={placeholder ? { width: '2.75rem', height: '2.75rem', borderRadius: '14px' } : iconWrapStyles}
+                                    >
+                                        {placeholder ? null : item.icon}
+                                    </div>
+
+                                    <div className="flex-grow-1" style={{ minWidth: 0 }}>
+                                        <div
+                                            className={placeholder ? "placeholder w-75 py-2 rounded mb-2" : 'text-secondary fs-14 mb-2'}
+                                            style={{ overflowWrap: 'anywhere' }}
+                                        >
+                                            {placeholder ? '' : item.title}
+                                        </div>
+
+                                        <div
+                                            className={placeholder ? "placeholder w-50 py-2 rounded" : 'fw-semibold text-dark'}
+                                            style={{ fontSize: '0.98rem', lineHeight: '1.4', overflowWrap: 'anywhere', wordBreak: 'break-word' }}
+                                        >
+                                            {placeholder ? '' : item.value}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ))
+                    }
+                </div>
             </Card.Body>
         </Card >
     )

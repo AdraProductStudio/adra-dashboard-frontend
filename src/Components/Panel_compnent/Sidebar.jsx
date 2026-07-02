@@ -29,12 +29,21 @@ const Sidebar = ({
         </>
     }
 
-    const headerFun = (width, height, image) => {
+    const handleFooterButton = (v, type) => {
+        return type === "offcanvas" ?
+            <div className="w-100 d-flex align-items-center justify-content-center gap-2">
+                {v.icon}
+                <p className='mb-0'>{v.name}</p>
+            </div>
+            :
+            hanldeButton(v)
+    }
+
+    const headerFun = (image) => {
         return <Img
             src={image}
             alt='company logo'
-            width={width}
-            height={height}
+            className="brand-logo brand-logo--sidebar mx-auto"
         />
     }
 
@@ -67,12 +76,14 @@ const Sidebar = ({
             <div className={`row h-100 ${type === "offcanvas" ? "align-items-center" : "align-items-end"}`}>
                 <ButtonComponent
                     componentFrom="sidebar menus"
-                    className={`w-100 border-dark sign-out-button text-dark d-flex flex-wrap align-items-end mb-2 rounded p-2`}
+                    className={`w-100 btn btn-outline-danger d-flex flex-wrap ${type === "offcanvas" ? "align-items-center justify-content-center" : "align-items-end"} mb-2 rounded p-2`}
                     title={"log"}
-                    buttonName={hanldeButton({
-                        icon: <CiLogout className='fs-4' />,
-                        name: "Log out"
-                    })}
+                    buttonName={
+                        handleFooterButton({
+                            icon: <CiLogout className='fs-4' />,
+                            name: "Log out"
+                        }, type)
+                    }
                     clickFunction={footerClickFunction}
                 />
             </div>
@@ -101,7 +112,7 @@ const Sidebar = ({
                                 <div className="sidebar-header">
                                     <div className="row h-100 align-items-center justify-content-center">
                                         <div className="col text-center">
-                                            {headerFun('80rem', '50rem', companyLogo)}
+                                            {headerFun(companyLogo)}
                                         </div>
                                     </div>
                                 </div>
@@ -131,12 +142,12 @@ const Sidebar = ({
                 offcanvasPlacement="start"
                 offcanvasClassname="rounded border-0"
                 handleCanvasOpenOrClose={handleCanvasOpenOrClose}
-                canvasHeader={headerFun('24%', '45px', companyLogo)}
-                offcanvasHeaderClassname="sidebar-header ms-5"
-                offcanvasHeaderTitleClassname="col-11"
+                canvasHeader={headerFun(companyLogo)}
+                offcanvasHeaderClassname="sidebar-header justify-content-center"
+                offcanvasHeaderTitleClassname="w-100 text-center"
                 offcanvasBodyClassname={footer ? "sidebar-body-with-footer py-3" : "sidebar-body-without-footer"}
                 canvasBody={bodyFun("offcanvas")}
-            // canvasFooter={footerFun("offcanvas")}
+                canvasFooter={footerFun("offcanvas")}
             />
         </>
     )

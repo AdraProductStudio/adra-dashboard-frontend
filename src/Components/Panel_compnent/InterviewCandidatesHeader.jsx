@@ -1,5 +1,5 @@
 import React from 'react'
-import { useCustomNavigate, useDispatch } from 'ResuableFunctions/CustomHooks';
+import { useCustomNavigate } from 'ResuableFunctions/CustomHooks';
 
 import Img from 'Components/Img/Img'
 import ButtonComponent from 'Components/Button/Button';
@@ -16,17 +16,16 @@ const InterviewCandidatesHeader = ({
   // const dispatch = useDispatch();
 
   return (
-    <header>
-      <Card className='shadow-sm border-0 h-100'>
+    <header className='shadow-sm bg-white border-0'>
+      <Card className='border-0 h-100'>
         <Card.Body className='h-100'>
           <div className="container-fluid h-100 p-0">
             <div className='d-flex flex-wrap align-items-center h-100 px-2 px-sm-4 px-md-5'>
               <div className="col">
                 <Img
-                  src={Image?.CompanyLogo}
-                  className="cursor-pointer"
-                  width="60rem"
-                  height="37rem"
+                  src={Image?.AdraLogo}
+                  alt="Adra logo"
+                  className="brand-logo brand-logo--header cursor-pointer"
                   clickFunction={logoRedirect ? () => navigate(logoRedirect) : null}
                 />
               </div>

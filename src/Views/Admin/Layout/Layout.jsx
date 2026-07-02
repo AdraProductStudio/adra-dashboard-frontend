@@ -5,13 +5,18 @@ import Images from 'Utils/Image';
 import { Outlet } from 'react-router-dom';
 import JsonData from 'Utils/JsonData';
 import useCommonState, { useCustomNavigate, useDispatch } from 'ResuableFunctions/CustomHooks';
-import { handleUpdateCanvasShow } from 'Views/Common/Action/Common_action';
+import { handleLogout, handleUpdateCanvasShow } from 'Views/Common/Action/Common_action';
 
 const Layout = () => {
     const { commonState } = useCommonState();
     const { adminSidebarMenus } = JsonData()?.jsonOnly;
     const dispatch = useDispatch();
     const navigate = useCustomNavigate();
+
+    const logoutFunction = () => {
+        dispatch(handleLogout());
+        navigate("/", { replace: true });
+    }
 
     return (
         <div className="d-flex flex-wrap main_rendering_contents_height">
@@ -22,7 +27,8 @@ const Layout = () => {
                 handleCanvasOpenOrClose={() => dispatch(handleUpdateCanvasShow)}
                 menuOptions={adminSidebarMenus}
                 header={true}
-                companyLogo={Images.CompanyLogo}
+                companyLogo={Images.AdraLogo}
+                footerClickFunction={logoutFunction}
             />
 
             <div className="col">
@@ -35,6 +41,7 @@ const Layout = () => {
                                 offcanvasOnButton={() => dispatch(handleUpdateCanvasShow)}
                                 dispatch={dispatch}
                                 navigate={navigate}
+                                logoutClickFunction={logoutFunction}
                             />
                         </div>
                     </header>

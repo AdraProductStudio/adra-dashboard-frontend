@@ -20,17 +20,17 @@ const Campaign_detail = () => {
         <Fragment>
             <div className="campaign_header border-bottom">
                 <div className="w-70">
-                    <ButtonComponent type="button" buttonName="Back" className="btn btn-outline-dark mb-2" clickFunction={() => navigate("/dashboard/interview")} />
-                    <h6 className='mb-0'>{adminState?.campaigns_data?.job_title || ''} campaign</h6>
+                    <ButtonComponent type="button" buttonName="Back" className="btn btn-outline-secondary mb-2" clickFunction={() => navigate("/dashboard/interview")} />
+                    <h6 className='mb-0 mt-2'>{adminState?.campaigns_data?.job_title || ''} campaign</h6>
                 </div>
 
                 <div className="flex-grow-1 text-end">
                     <div className="w-100 h-100 d-flex justify-content-end align-items-center">
                         <div className="px-2">
-                            <ButtonComponent type="button" buttonName="Generate Sample Test" className="btn btn-outline-dark" clickFunction={() => navigate(`/dashboard/interview/${campaign_id}/generate_sample_test`)} btnDisable={!adminState?.campaigns_data?.question_pattern?.length} />
+                            <ButtonComponent type="button" buttonName="Generate Sample Test" className="btn btn-outline-primary" clickFunction={() => navigate(`/dashboard/interview/${campaign_id}/generate_sample_test`)} btnDisable={!adminState?.campaigns_data?.question_pattern?.length} />
                         </div>
                         <div className="px-2">
-                            <ButtonComponent type="button" buttonName="Generate Questions" className="btn btn-outline-dark" clickFunction={() => dispatch(handleGetQuestionTypes())} />
+                            <ButtonComponent type="button" buttonName="Generate Questions" className="btn btn-outline-primary" clickFunction={() => dispatch(handleGetQuestionTypes())} />
                         </div>
                     </div>
                 </div>

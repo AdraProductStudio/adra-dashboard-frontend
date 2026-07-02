@@ -44,51 +44,45 @@ export function OverallModel() {
                     case "generate_question_modal":
                         return <div className="w-100 instructions_height overflowY">
                             <div className="h-100 row align-items-center justify-content-center w-100">
-                                <div className="col-8">
-                                    <h2 className="text-center">Welcome to Adra Product Studio</h2>
-                                    <h3 style={{ marginTop: "20px" }}>Test Instructions</h3>
-                                    <ul style={{ lineHeight: "1.8" }}>
-                                        <li>Do not switch tabs or minimize the test window during the exam.</li>
-                                        <li>Ensure you have a stable internet connection throughout the test.</li>
-                                        <li>Do not use mobile phones, calculators, or external devices unless permitted.</li>
-                                        <li>You must complete the test within the given time limit.</li>
-                                        <li>Once the test begins, do not refresh or close the browser.</li>
-                                        <li>Any suspicious activity may result in disqualification.</li>
-                                    </ul>
+                                <div className="col-12 col-lg-10 col-xl-9">
+                                    <div className="">
+                                        <div className="">
+                                            <h2 className="interview-instructions__title text-center brand_color">Welcome to Adra</h2>
+                                            <p className="interview-instructions__subtitle mb-0 text-center">
+                                                Review the instructions before starting your test.
+                                            </p>
+                                        </div>
 
-                                    <p style={{ marginTop: "20px", fontWeight: "bold" }}>
-                                        By starting the test, you agree to follow these rules.
-                                        Click the <u>Start Test</u> button below to begin.
-                                    </p>
+                                        <div className="interview-instructions__body">
+                                            <h3 className="interview-instructions__section-title">Test Instructions</h3>
+                                            <ul className="interview-instructions__list">
+                                                <li>Do not switch tabs or minimize the test window during the exam.</li>
+                                                <li>Ensure you have a stable internet connection throughout the test.</li>
+                                                <li>Do not use mobile phones, calculators, or external devices unless permitted.</li>
+                                                <li>You must complete the test within the given time limit.</li>
+                                                <li>Once the test begins, do not refresh or close the browser.</li>
+                                                <li>Any suspicious activity may result in disqualification.</li>
+                                            </ul>
 
-                                    <div style={{ marginTop: "15px" }}>
-                                        <label>
-                                            <input
-                                                type="checkbox"
-                                                checked={agreed}
-                                                onChange={(e) => setAgreed(e.target.checked)}
-                                            />{" "}
-                                            I have read and agree to the instructions
-                                        </label>
-                                    </div>
+                                            <div className="interview-instructions__agreement">
+                                                <label className="interview-instructions__checkbox">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={agreed}
+                                                        onChange={(e) => setAgreed(e.target.checked)}
+                                                    />
+                                                    <span>I have read and agree to the instructions</span>
+                                                </label>
 
-                                    <div className="text-center">
-                                        <button
-                                            onClick={() => dispatch(handleGetQuestions)}
-                                            style={{
-                                                marginTop: "20px",
-                                                padding: "10px 20px",
-                                                fontSize: "16px",
-                                                cursor: "pointer",
-                                                backgroundColor: agreed ? "#4caf50" : "#ccc",
-                                                color: "white",
-                                                border: "none",
-                                                borderRadius: "5px",
-                                            }}
-                                            disabled={!agreed || interviewState?.start_test_spinner}
-                                        >
-                                            {interviewState?.start_test_spinner ? "Getting Questions..." : "Start Test"}
-                                        </button>
+                                                <button
+                                                    className="interview-instructions__button"
+                                                    onClick={() => dispatch(handleGetQuestions)}
+                                                    disabled={!agreed || interviewState?.start_test_spinner}
+                                                >
+                                                    {interviewState?.start_test_spinner ? "Getting Questions..." : "Start Test"}
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -135,14 +129,25 @@ export function OverallModel() {
                         </div >
 
                     case "test_completed":
-                        return <div className="w-100 interview_candidate_height">
-                            <div className="row py-5 align-items-center justify-content-center h-100 w-100">
-                                <div className="col-6 text-center">
-                                    <h5 className="text-center my-3">Test completed</h5>
-                                    <p className="text-secondary">Thank you for your commitment, and best of luck with your next steps!....</p>
+                        return <div className="w-100 test-completed-modal">
+                            <div className="row align-items-center justify-content-center h-100 w-100 m-0">
+                                <div className="col-12 col-md-10 col-lg-8 col-xl-7">
+                                    <div className="text-center">
+                                        <div className="test-completed-icon mx-auto">
+                                            {Icons?.testSucccess}
+                                        </div>
+                                        <span className="test-completed-status">Submitted successfully</span>
+                                        <h4 className="test-completed-title">Test completed</h4>
+                                        <p className="test-completed-message">
+                                            Thank you for completing your assessment. Your responses have been submitted successfully.
+                                        </p>
+                                        <div className="test-completed-note">
+                                            You can now close this window and wait for the next update from the recruitment team.
+                                        </div>
+                                    </div>
                                     <ButtonComponent
                                         buttonName="Close"
-                                        className="btn-outline-secondary px-5"
+                                        className="btn-brand test-completed-button"
                                         clickFunction={() => dispatch(handleCloseTestAndNavigate)}
                                     />
                                 </div>
@@ -181,13 +186,13 @@ export function OverallModel() {
                         return <div className="col-11 mx-auto py-2">
                             {Inputfunctions(JsonJsx?.create_campaign_inputs)}
                             <ButtonSpinner
-                                className="btn btn-dark text-center w-100 mt-3"
+                                className="btn btn-primary text-center w-100 mt-3"
                                 title={adminState?.create_campaign?._id ? "Update" : "Create"}
                                 is_spinner={adminState?.create_update_campaign_spinner || false}
                                 clickFunction={adminState?.create_campaign?._id ?
                                     () => dispatch(handleEditCampaign(adminState?.create_campaign))
                                     :
-                                    () => dispatch(handleCreateCampaign({ job_title: adminState?.create_campaign?.job_title, interview_date: adminState?.create_campaign?.interview_date, test_time_duration: adminState?.create_campaign?.test_time_duration }))}
+                                    () => dispatch(handleCreateCampaign({ job_title: adminState?.create_campaign?.job_title, interview_date: adminState?.create_campaign?.interview_date, test_time_duration: adminState?.create_campaign?.test_time_duration, company_flag: adminState?.create_campaign?.company_flag }))}
                             />
                         </div>
 
@@ -202,7 +207,7 @@ export function OverallModel() {
                                 </p>
                             </div>
                             <ButtonSpinner
-                                className="btn btn-dark text-center w-100 mt-3"
+                                className="btn btn-outline-danger text-center w-100 mt-3"
                                 title={adminState?.delete_campaign_spinner ? "Deleting..." : "Delete"}
                                 is_spinner={adminState?.delete_campaign_spinner || false}
                                 clickFunction={() => dispatch(handleDeleteCampaign(commonState?.modalData))}
@@ -221,7 +226,7 @@ export function OverallModel() {
                                 </p>
                             </div>
                             <ButtonSpinner
-                                className="btn btn-dark text-center w-100 mt-3"
+                                className="btn btn-outline-danger text-center w-100 mt-3"
                                 title="Delete"
                                 is_spinner={adminState?.delete_candidate_spinner || false}
                                 clickFunction={() => dispatch(handleDeleteCandidate(commonState?.modalData))}
@@ -234,7 +239,7 @@ export function OverallModel() {
                                 {Inputfunctions(JsonJsx?.admin_create_assigning_questions)}
 
                                 <ButtonSpinner
-                                    className="btn btn-dark text-center w-100 mt-3"
+                                    className="btn btn-primary text-center w-100 mt-3"
                                     title={adminState?.create_assigning_questions?._id ? "Update" : "Add"}
                                     clickFunction={
                                         adminState?.create_assigning_questions?._id ?
@@ -248,54 +253,59 @@ export function OverallModel() {
                             <div className="col-lg-7 row ps-2 align-items-start">
                                 {
                                     adminState?.campaigns_data?.question_pattern?.length ?
-                                        <table className="col-12 table table-hover">
-                                            <thead>
-                                                <tr>
-                                                    <th scope="col">Type</th>
-                                                    <th scope="col">Level</th>
-                                                    <th scope="col">Count</th>
-                                                    <th scope="col">Edit</th>
-                                                    <th scope="col">Delete</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {adminState?.campaigns_data?.question_pattern?.map((item, index) => (
-                                                    <tr className="py-2">
-                                                        <td className="col text-secondary">{item?.question_type}</td>
-                                                        <td className="col text-secondary">{item?.difficulty_level}</td>
-                                                        <td className="col text-secondary">{item?.questions_count}</td>
-                                                        <td className="col text-secondary">
-                                                            <ButtonComponent
-                                                                type="button"
-                                                                className="btn-transparent"
-                                                                buttonName={Icons?.editIcon}
-                                                                clickFunction={() => dispatch(edit_campaign_data(item))}
-                                                            />
-                                                        </td>
-                                                        <td className="col text-secondary">
-                                                            <ButtonComponent
-                                                                type="button"
-                                                                className="btn-transparent"
-                                                                buttonName={Icons?.deleteIcon}
-                                                                clickFunction={() => dispatch(handleDeleteQuestionPattern({ question_id: item?._id, campaign_id: adminState?.campaigns_data?._id }))}
-                                                            />
+                                        <div className="d-flex flex-column justify-content-between h-100">
+                                            <table className="col-12 table table-hover mt-2">
+                                                <thead>
+                                                    <tr>
+                                                        <th scope="col">Type</th>
+                                                        <th scope="col">Level</th>
+                                                        <th scope="col">Count</th>
+                                                        <th scope="col">Edit</th>
+                                                        <th scope="col">Delete</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {adminState?.campaigns_data?.question_pattern?.map((item, index) => (
+                                                        <tr className="py-2">
+                                                            <td className="col text-secondary">{item?.question_type}</td>
+                                                            <td className="col text-secondary">{item?.difficulty_level}</td>
+                                                            <td className="col text-secondary">{item?.questions_count}</td>
+                                                            <td className="col text-secondary">
+                                                                <ButtonComponent
+                                                                    type="button"
+                                                                    className="btn-transparent"
+                                                                    buttonName={Icons?.editIcon}
+                                                                    clickFunction={() => dispatch(edit_campaign_data(item))}
+                                                                />
+                                                            </td>
+                                                            <td className="col text-secondary">
+                                                                <ButtonComponent
+                                                                    type="button"
+                                                                    className="btn-transparent"
+                                                                    buttonName={Icons?.deleteIcon}
+                                                                    clickFunction={() => dispatch(handleDeleteQuestionPattern({ question_id: item?._id, campaign_id: adminState?.campaigns_data?._id }))}
+                                                                />
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                                <tfoot>
+                                                    <tr>
+                                                        <td colSpan={5}>
+                                                            <span>Total number of Questions: {
+                                                                adminState?.campaigns_data?.question_pattern?.reduce(
+                                                                    (acc, curr) => acc + Number(curr.questions_count || 0),
+                                                                    0
+                                                                )}
+                                                            </span>
                                                         </td>
                                                     </tr>
-                                                ))}
-                                            </tbody>
-                                            <tfoot>
-                                                <tr>
-                                                    <td colSpan={5}>
-                                                        <span>Total number of Questions: {
-                                                            adminState?.campaigns_data?.question_pattern?.reduce(
-                                                                (acc, curr) => acc + Number(curr.questions_count || 0),
-                                                                0
-                                                            )}
-                                                        </span>
-                                                    </td>
-                                                </tr>
-                                            </tfoot>
-                                        </table>
+                                                </tfoot>
+                                            </table>
+                                            <p className="d-flex justify-content-end mb-0">
+                                                <ButtonComponent buttonName="Save" className="btn-primary w-25 " clickFunction={() => dispatch(updateModalShow(false))} />
+                                            </p>
+                                        </div>
                                         :
                                         <div className="col-12 text-center">
                                             <p className="text-secondary">Question pattern not added. its looks like empty!!!</p>
@@ -331,8 +341,8 @@ export function OverallModel() {
                                             :
                                             "Submit test"
                                     }
-                                    className="btn-outline-secondary w-100"
-                                    clickFunction={() => dispatch(handleCloseTestEndpoint(interviewState?.generatedQuestions))}
+                                    className="btn-brand w-100"
+                                    clickFunction={() => dispatch(handleCloseTestEndpoint(interviewState?.generatedQuestions, navigate))}
                                 />
                             </div>
                         </div>
@@ -353,7 +363,7 @@ export function OverallModel() {
             modalSize={commonState?.modalSize}
             modalCentered={true}
             modalCloseButton={commonState?.modal_close_btn}
-            showModalHeader={true}
+            showModalHeader={commonState?.modal_type === "assign_question" && adminState?.campaigns_data?.question_pattern?.length > 0 ? false : true}
             modalHeaderClassname="border-0"
             modalHeader={modalHeaderFun()}
             modalBodyClassname={`${/lg|xl/.test(commonState?.modalSize) && commonState?.enable_lg_autoScroll ? "model_height_lg rounded-4" : ''} py-2`}

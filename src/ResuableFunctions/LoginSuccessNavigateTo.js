@@ -5,7 +5,7 @@ export function LoginSuccessNavigateTo(user_role, navigate) {
             break;
 
         case "admin":
-            navigate("/dashboard/home");
+            navigate("/dashboard/interview");
             break;
 
         default:

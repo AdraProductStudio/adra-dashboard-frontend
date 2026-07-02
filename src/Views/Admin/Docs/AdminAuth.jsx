@@ -14,7 +14,7 @@ const AdminAuth = () => {
         }
 
         if (["dashboard"]?.includes(commonState?.currentMenuName)) {
-            navigate("/dashboard/home")
+            navigate("/dashboard/interview")
         }
     }, [commonState?.currentMenuName, commonState?.user_role, commonState?.token])
 
