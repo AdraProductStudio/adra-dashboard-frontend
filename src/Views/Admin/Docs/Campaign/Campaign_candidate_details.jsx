@@ -35,6 +35,19 @@ const formatProgrammingRemainingTime = (seconds) => {
     return `${minutes} : ${remainingSeconds}`;
 };
 
+const getProgrammingGradeLabel = (grade) => {
+    if (grade === "Worst") return "Progressing";
+    if (grade === "Better") return "Good";
+    if (grade === "Good") return "Excelent";
+    return grade || "Progressing";
+};
+
+const getProgrammingGradeClass = (grade) => {
+    if (grade === "Excelent") return "test_completed_badge";
+    if (grade === "Good") return "test_progress_badge";
+    return "test_not_started_badge";
+};
+
 const Campaign_candidate_details = () => {
     const { campaign_id, candidate_id } = useParams();
     const dispatch = useDispatch();
@@ -188,6 +201,7 @@ const Campaign_candidate_details = () => {
                                                 {displayedProgrammingSubmissions.map((submission, index) => {
                                                     const questionEvaluation = getProgrammingQuestionEvaluation(submission?.question_id);
                                                     const hasQuestionEvaluation = questionEvaluation?.score !== undefined || questionEvaluation?.grade;
+                                                    const questionGrade = getProgrammingGradeLabel(questionEvaluation?.grade);
 
                                                     return (
                                                         <div className="col-12" key={submission?.question_id || index}>
@@ -202,8 +216,8 @@ const Campaign_candidate_details = () => {
                                                                             <span className='interview_candidate_badge test_progress_badge'>
                                                                                 Score: {questionEvaluation?.score ?? 0}/100
                                                                             </span>
-                                                                            <span className={`interview_candidate_badge ${questionEvaluation?.grade === "Good" ? "test_completed_badge" : questionEvaluation?.grade === "Better" ? "test_progress_badge" : "test_not_started_badge"}`}>
-                                                                                {questionEvaluation?.grade || "Worst"}
+                                                                            <span className={`interview_candidate_badge ${getProgrammingGradeClass(questionGrade)}`}>
+                                                                                {questionGrade}
                                                                             </span>
                                                                         </div>
                                                                     )}
@@ -238,7 +252,7 @@ const Campaign_candidate_details = () => {
                                                 <div className="col-12 col-md-4">
                                                     <div className='campaign-candidate-card__detail-box h-100'>
                                                         <div className='campaign-candidate-card__eyebrow mb-1'>Grade</div>
-                                                        <div className='text-dark fw-semibold'>{programmingEvaluation?.grade || "-"}</div>
+                                                        <div className='text-dark fw-semibold'>{getProgrammingGradeLabel(programmingEvaluation?.grade)}</div>
                                                     </div>
                                                 </div>
                                                 <div className="col-12 col-md-4">

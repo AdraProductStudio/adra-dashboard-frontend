@@ -133,6 +133,14 @@ const CampaignCandidatesCard = ({
         return scored;
     }
 
+    function programming_grade_label(grade) {
+        if (grade === "Worst") return "Progressing";
+        if (grade === "Better") return "Good";
+        if (grade === "Good") return "Excelent";
+
+        return grade;
+    }
+
     const showTimer = data?.status !== "Test Completed" && timeLeft !== "Test time is over" && data?.status !== "malpractice";
     const scoreValue = test_score(data?.test_score);
     const programmingStatus = data?.programming_assessment?.status;
@@ -142,7 +150,7 @@ const CampaignCandidatesCard = ({
     const showProgrammingStatus = programmingStatus && programmingStatus !== "Not Started";
     const showProgrammingTimer = programmingStatus === "In Progress" && programmingTimeLeft && programmingTimeLeft !== "Test time is over";
     const showProgrammingResult = programmingStatus === "Completed" || programmingEvaluation?.status === "Completed";
-    const programmingGradeValue = programmingGrade || (programmingEvaluation?.status === "Pending" ? "Pending" : "-");
+    const programmingGradeValue = programmingGrade ? programming_grade_label(programmingGrade) : (programmingEvaluation?.status === "Pending" ? "Pending" : "-");
     const programmingScoreValue = programmingScore !== null && programmingScore !== undefined ? `${programmingScore}/100` : null;
     const activeTimers = [
         showTimer ? {
