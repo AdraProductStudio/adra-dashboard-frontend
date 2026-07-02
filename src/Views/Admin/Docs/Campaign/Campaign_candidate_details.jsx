@@ -2,20 +2,86 @@ import ButtonComponent from 'Components/Button/Button'
 import CampaignCandidatesCard from 'Components/Card/CampaignCandidatesCard';
 import Checkbox from 'Components/Input/Checkbox';
 import SpinnerComponent from 'Components/Spinner/Spinner';
-import React, { Fragment, useEffect } from 'react'
+import React, { Fragment, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom';
 import useCommonState, { useCustomNavigate, useDispatch } from 'ResuableFunctions/CustomHooks'
 import { handleGetIndividualCampaignCandidate } from 'Views/Admin/Action/AdminAction';
+
+const getProgrammingStatusClass = (status) => {
+    if (status === "Completed") return "test_completed_badge";
+    if (status === "In Progress") return "test_progress_badge";
+    if (status === "Malpractice") return "test_not_started_badge";
+    return "test_not_started_badge";
+};
+
+const getProgrammingRemainingSeconds = (programmingAssessment) => {
+    if (programmingAssessment?.status !== "In Progress" || !programmingAssessment?.test_started_on) return null;
+
+    const startedOn = new Date(programmingAssessment.test_started_on).getTime();
+    if (Number.isNaN(startedOn)) return null;
+
+    const duration = Number(programmingAssessment?.duration) || 0;
+    const elapsedSeconds = Math.floor((Date.now() - startedOn) / 1000);
+
+    return Math.max(duration - elapsedSeconds, 0);
+};
+
+const formatProgrammingRemainingTime = (seconds) => {
+    if (seconds === null || seconds === undefined) return "-";
+
+    const minutes = String(Math.floor(seconds / 60)).padStart(2, "0");
+    const remainingSeconds = String(seconds % 60).padStart(2, "0");
+
+    return `${minutes} : ${remainingSeconds}`;
+};
 
 const Campaign_candidate_details = () => {
     const { campaign_id, candidate_id } = useParams();
     const dispatch = useDispatch();
     const navigate = useCustomNavigate();
     const { adminState } = useCommonState();
+    const programmingAssessment = adminState?.campaign_candidate_details?.programming_assessment || {};
+    const programmingStatus = programmingAssessment?.status || "Not Started";
+    const programmingEvaluation = programmingAssessment?.ai_evaluation || {};
+    const programmingDuration = programmingAssessment?.duration;
+    const programmingStartedOn = programmingAssessment?.test_started_on;
+    const programmingEvaluationStatus = programmingEvaluation?.status;
+    const programmingQuestion = programmingAssessment?.selected_question || {};
+    const programmingAnswer = programmingAssessment?.candidate_answer;
+    const isProgrammingInProgress = programmingStatus === "In Progress";
+    const isProgrammingCompleted = programmingStatus === "Completed";
+    const isProgrammingEvaluationPending = isProgrammingCompleted && programmingEvaluationStatus === "Pending";
+    const isProgrammingEvaluationFailed = isProgrammingCompleted && programmingEvaluationStatus === "Failed";
+    const isProgrammingEvaluationCompleted = isProgrammingCompleted && programmingEvaluationStatus === "Completed";
+    const hasProgrammingSubmission = Boolean(programmingQuestion?.title || programmingQuestion?.description || programmingAnswer);
+    const [programmingRemainingSeconds, setProgrammingRemainingSeconds] = useState(null);
 
     useEffect(() => {
         dispatch(handleGetIndividualCampaignCandidate({ candidate_id }))
-    }, [])
+    }, [candidate_id])
+
+    useEffect(() => {
+        const syncRemainingTime = () => {
+            setProgrammingRemainingSeconds(getProgrammingRemainingSeconds({
+                duration: programmingDuration,
+                status: programmingStatus,
+                test_started_on: programmingStartedOn
+            }));
+        };
+
+        syncRemainingTime();
+
+        if (!isProgrammingInProgress) return undefined;
+
+        const timer = setInterval(syncRemainingTime, 1000);
+
+        return () => clearInterval(timer);
+    }, [
+        isProgrammingInProgress,
+        programmingDuration,
+        programmingStartedOn,
+        programmingStatus
+    ])
 
     return (
         adminState?.campaign_candidate_glow ?
@@ -64,6 +130,118 @@ const Campaign_candidate_details = () => {
                                         <p className='text-success'>Correct answer: {item?.answer}</p>
                                     </div>
                                 ))}
+
+                                <div className="col-12 py-3 border-bottom">
+                                    <div className='d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3'>
+                                        <h6 className='mb-0'>Programming Assessment</h6>
+                                        <div className={`interview_candidate_badge ${getProgrammingStatusClass(programmingStatus)}`}>
+                                            {programmingStatus}
+                                        </div>
+                                    </div>
+
+                                    <div className="row g-3">
+                                        <div className="col-12 col-md-4">
+                                            <div className='campaign-candidate-card__detail-box h-100'>
+                                                <div className='campaign-candidate-card__eyebrow mb-1'>Assessment Status</div>
+                                                <div className='text-dark fw-semibold'>{programmingStatus}</div>
+                                            </div>
+                                        </div>
+
+                                        {isProgrammingInProgress && (
+                                            <div className="col-12 col-md-4">
+                                                <div className='campaign-candidate-card__detail-box h-100'>
+                                                    <div className='campaign-candidate-card__eyebrow mb-1'>Remaining Time</div>
+                                                    <div className='text-dark fw-semibold'>
+                                                        {formatProgrammingRemainingTime(programmingRemainingSeconds)}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {hasProgrammingSubmission && (
+                                            <Fragment>
+                                                <div className="col-12">
+                                                    <div className='campaign-candidate-card__detail-box h-100'>
+                                                        <div className='campaign-candidate-card__eyebrow mb-1'>Candidate Question</div>
+                                                        <div className='text-dark fw-semibold text-break mb-2'>{programmingQuestion?.title || "-"}</div>
+                                                        <div className='text-secondary text-break'>{programmingQuestion?.description || "-"}</div>
+                                                    </div>
+                                                </div>
+                                                <div className="col-12 col-md-4">
+                                                    <div className='campaign-candidate-card__detail-box h-100'>
+                                                        <div className='campaign-candidate-card__eyebrow mb-1'>Selected Language</div>
+                                                        <div className='text-dark fw-semibold text-break'>{programmingAssessment?.selected_language || "-"}</div>
+                                                    </div>
+                                                </div>
+                                                <div className="col-12">
+                                                    <div className='campaign-candidate-card__detail-box h-100'>
+                                                        <div className='campaign-candidate-card__eyebrow mb-1'>Candidate Answer</div>
+                                                        <pre className='mb-0 text-dark' style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>{programmingAnswer || "-"}</pre>
+                                                    </div>
+                                                </div>
+                                            </Fragment>
+                                        )}
+
+                                        {isProgrammingEvaluationCompleted && (
+                                            <Fragment>
+                                                <div className="col-12 col-md-4">
+                                                    <div className='campaign-candidate-card__detail-box h-100'>
+                                                        <div className='campaign-candidate-card__eyebrow mb-1'>AI Evaluation Status</div>
+                                                        <div className='text-dark fw-semibold'>{programmingEvaluation?.status || "-"}</div>
+                                                    </div>
+                                                </div>
+                                                <div className="col-12 col-md-4">
+                                                    <div className='campaign-candidate-card__detail-box h-100'>
+                                                        <div className='campaign-candidate-card__eyebrow mb-1'>Grade</div>
+                                                        <div className='text-dark fw-semibold'>{programmingEvaluation?.grade || "-"}</div>
+                                                    </div>
+                                                </div>
+                                                <div className="col-12 col-md-4">
+                                                    <div className='campaign-candidate-card__detail-box h-100'>
+                                                        <div className='campaign-candidate-card__eyebrow mb-1'>Score</div>
+                                                        <div className='text-dark fw-semibold'>
+                                                            {programmingEvaluation?.score !== null && programmingEvaluation?.score !== undefined ? `${programmingEvaluation.score}/100` : "-"}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="col-12">
+                                                    <div className='campaign-candidate-card__detail-box h-100'>
+                                                        <div className='campaign-candidate-card__eyebrow mb-1'>Feedback</div>
+                                                        <div className='text-dark text-break'>{programmingEvaluation?.feedback || "-"}</div>
+                                                    </div>
+                                                </div>
+                                            </Fragment>
+                                        )}
+
+                                        {isProgrammingEvaluationPending && (
+                                            <div className="col-12 col-md-4">
+                                                <div className='campaign-candidate-card__detail-box h-100'>
+                                                    <div className='campaign-candidate-card__eyebrow mb-1'>AI Evaluation Status</div>
+                                                    <div className='text-dark fw-semibold'>AI Evaluation in Progress</div>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {isProgrammingEvaluationFailed && (
+                                            <Fragment>
+                                                <div className="col-12 col-md-4">
+                                                    <div className='campaign-candidate-card__detail-box h-100'>
+                                                        <div className='campaign-candidate-card__eyebrow mb-1'>AI Evaluation Status</div>
+                                                        <div className='text-danger fw-semibold'>AI Evaluation Failed</div>
+                                                    </div>
+                                                </div>
+                                                {programmingEvaluation?.error && (
+                                                    <div className="col-12">
+                                                        <div className='campaign-candidate-card__detail-box h-100'>
+                                                            <div className='campaign-candidate-card__eyebrow mb-1'>Error Message</div>
+                                                            <div className='text-danger text-break'>{programmingEvaluation.error}</div>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </Fragment>
+                                        )}
+                                    </div>
+                                </div>
 
                             </div>
                         </div>

@@ -8,6 +8,8 @@ import Error from "Views/Common/Docs/error";
 import InterviewCandidatesRegistration from "Views/InterviewCandidates/Docs/InterviewCandidatesRegistration";
 import InterviewCandidatesHome from "Views/InterviewCandidates/Docs/InterviewCandidatesHome";
 import InterviewCandidatesAuth from "Views/InterviewCandidates/Docs/InterviewCandidatesAuth";
+import ProgrammingAssessment from "Views/InterviewCandidates/Docs/ProgrammingAssessment";
+import ProgrammingAssessmentPreparation from "Views/InterviewCandidates/Docs/ProgrammingAssessmentPreparation";
 import AdminAuth from "Views/Admin/Docs/AdminAuth";
 import Layout from "Views/Admin/Layout/Layout";
 import Campaign from 'Views/Admin/Docs/Campaign/Campaign';
@@ -33,6 +35,8 @@ const App = () => {
           {/* interview candidates Views */}
           <Route path="candidates_home" element={<InterviewCandidatesAuth />}>
             <Route index element={<InterviewCandidatesHome />} />
+            <Route path="programming-preparation" element={<ProgrammingAssessmentPreparation />} />
+            <Route path="programming-assessment" element={<ProgrammingAssessment />} />
           </Route>
 
           {/* Admin view */}

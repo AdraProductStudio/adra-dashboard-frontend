@@ -342,7 +342,7 @@ export function OverallModel() {
                                             "Submit test"
                                     }
                                     className="btn-brand w-100"
-                                    clickFunction={() => dispatch(handleCloseTestEndpoint(interviewState?.generatedQuestions))}
+                                    clickFunction={() => dispatch(handleCloseTestEndpoint(interviewState?.generatedQuestions, navigate))}
                                 />
                             </div>
                         </div>

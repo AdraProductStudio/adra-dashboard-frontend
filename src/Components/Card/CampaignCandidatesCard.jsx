@@ -13,6 +13,7 @@ const CampaignCandidatesCard = ({
 
 }) => {
     const [timeLeft, setTimeLeft] = useState("");
+    const [programmingTimeLeft, setProgrammingTimeLeft] = useState("");
     const dispatch = useDispatch();
 
     function apti_status(status) {
@@ -31,6 +32,14 @@ const CampaignCandidatesCard = ({
         else if (status === "malpractice") return 'test_not_started_badge';
 
         return 'test_progress_badge';
+    }
+
+    function programming_status_colors(status) {
+        if (status === "Completed") return 'test_completed_badge';
+        else if (status === "In Progress") return 'test_progress_badge';
+        else if (status === "Malpractice") return 'test_not_started_badge';
+
+        return 'test_not_started_badge';
     }
 
     useEffect(() => {
@@ -55,6 +64,44 @@ const CampaignCandidatesCard = ({
 
         return () => clearInterval(timer);
     }, [data?.test_EndedOn]);
+
+    useEffect(() => {
+        const calculateProgrammingTimeLeft = () => {
+            if (data?.programming_assessment?.status !== "In Progress" || !data?.programming_assessment?.test_started_on) {
+                setProgrammingTimeLeft("");
+                return;
+            }
+
+            const startedOn = new Date(data.programming_assessment.test_started_on).getTime();
+            const durationSeconds = Number(data?.programming_assessment?.duration) || 0;
+
+            if (Number.isNaN(startedOn) || !durationSeconds) {
+                setProgrammingTimeLeft("");
+                return;
+            }
+
+            const endsOn = startedOn + durationSeconds * 1000;
+            const timeLeftMs = endsOn - Date.now();
+
+            if (timeLeftMs <= 0) {
+                setProgrammingTimeLeft("Test time is over");
+            } else {
+                const minutes = Math.floor(timeLeftMs / 60000);
+                const seconds = Math.floor((timeLeftMs % 60000) / 1000);
+                setProgrammingTimeLeft(`${minutes}m ${seconds}s left`);
+            }
+        };
+
+        calculateProgrammingTimeLeft();
+
+        const timer = setInterval(calculateProgrammingTimeLeft, 1000);
+
+        return () => clearInterval(timer);
+    }, [
+        data?.programming_assessment?.duration,
+        data?.programming_assessment?.status,
+        data?.programming_assessment?.test_started_on
+    ]);
 
     function test_score(score) {
         if (!score) return "0 / 0";
@@ -88,6 +135,27 @@ const CampaignCandidatesCard = ({
 
     const showTimer = data?.status !== "Test Completed" && timeLeft !== "Test time is over" && data?.status !== "malpractice";
     const scoreValue = test_score(data?.test_score);
+    const programmingStatus = data?.programming_assessment?.status;
+    const programmingEvaluation = data?.programming_assessment?.ai_evaluation || {};
+    const programmingGrade = programmingEvaluation?.grade;
+    const programmingScore = programmingEvaluation?.score;
+    const showProgrammingStatus = programmingStatus && programmingStatus !== "Not Started";
+    const showProgrammingTimer = programmingStatus === "In Progress" && programmingTimeLeft && programmingTimeLeft !== "Test time is over";
+    const showProgrammingResult = programmingStatus === "Completed" || programmingEvaluation?.status === "Completed";
+    const programmingGradeValue = programmingGrade || (programmingEvaluation?.status === "Pending" ? "Pending" : "-");
+    const programmingScoreValue = programmingScore !== null && programmingScore !== undefined ? `${programmingScore}/100` : null;
+    const activeTimers = [
+        showTimer ? {
+            label: "MCQ Assessment",
+            value: timeLeft,
+            note: "Candidate can still complete the MCQ test"
+        } : null,
+        showProgrammingTimer ? {
+            label: "Programming Assessment",
+            value: programmingTimeLeft,
+            note: "Candidate can still complete the programming test"
+        } : null
+    ].filter(Boolean);
 
     const cardStyles = {
         border: '1px solid #E7EDF3',
@@ -138,8 +206,16 @@ const CampaignCandidatesCard = ({
 
             <Card.Header className='border-0 px-3 px-xl-4 pt-3 pb-3 position-relative' style={headerStyles}>
                 <div className="d-flex justify-content-between align-items-start gap-2 mb-2">
-                    <div className={`interview_candidate_badge ${apti_status_colors(data?.status || '')}`}>
-                        {apti_status(data?.status || '')}
+                    <div className="d-flex flex-wrap gap-2">
+                        <div className={`interview_candidate_badge ${apti_status_colors(data?.status || '')}`}>
+                            {apti_status(data?.status || '')}
+                        </div>
+
+                        {showProgrammingStatus && (
+                            <div className={`interview_candidate_badge ${programming_status_colors(programmingStatus)}`}>
+                                Programming: {programmingStatus}
+                            </div>
+                        )}
                     </div>
 
                     {!detail_view && (
@@ -193,21 +269,40 @@ const CampaignCandidatesCard = ({
                     </div>
 
                     <div className={`campaign-candidate-card__status-panel ${detail_view ? 'mx-auto campaign-candidate-card__status-panel--detail' : ''}`}>
-                        {showTimer ? (
-                            <div className='d-flex align-items-start gap-2 text-dark'>
-                                <div className='campaign-candidate-card__status-icon'>
-                                    <PiClockCountdown size={18} className='flex-shrink-0 text-primary' />
-                                </div>
-                                <div>
-                                    <div className='campaign-candidate-card__eyebrow'>Assessment window</div>
-                                    <div className='campaign-candidate-card__status-value'>{timeLeft}</div>
-                                    <div className='campaign-candidate-card__status-note'>Candidate can still complete the test</div>
-                                </div>
+                        {activeTimers.length ? (
+                            <div className='d-grid gap-2'>
+                                {activeTimers.map((timer) => (
+                                    <div className='d-flex align-items-start gap-2 text-dark' key={timer.label}>
+                                        <div className='campaign-candidate-card__status-icon'>
+                                            <PiClockCountdown size={18} className='flex-shrink-0 text-primary' />
+                                        </div>
+                                        <div>
+                                            <div className='campaign-candidate-card__eyebrow'>{timer.label}</div>
+                                            <div className='campaign-candidate-card__status-value'>{timer.value}</div>
+                                            <div className='campaign-candidate-card__status-note'>{timer.note}</div>
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
                         ) : (
-                            <div className='campaign-candidate-card__score-panel'>
-                                <div className='campaign-candidate-card__eyebrow'>Test score</div>
-                                <div className='campaign-candidate-card__score-value'>{scoreValue}</div>
+                            <div className='campaign-candidate-card__score-panel d-grid gap-2'>
+                                <div>
+                                    <div className='campaign-candidate-card__eyebrow'>MCQ Score</div>
+                                    <div className='campaign-candidate-card__score-value'>{scoreValue}</div>
+                                </div>
+
+                                {showProgrammingResult && (
+                                    <div className='pt-2 border-top'>
+                                        <div className='campaign-candidate-card__eyebrow'>Programming Grade</div>
+                                        <div className='campaign-candidate-card__status-value'>{programmingGradeValue}</div>
+                                        {programmingScoreValue && (
+                                            <div className='campaign-candidate-card__status-note'>
+                                                Score: {programmingScoreValue}
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
                                 <div className='campaign-candidate-card__status-note'>
                                     {data?.status === "malpractice" ? 'Candidate flagged during assessment' : 'Assessment closed'}
                                 </div>

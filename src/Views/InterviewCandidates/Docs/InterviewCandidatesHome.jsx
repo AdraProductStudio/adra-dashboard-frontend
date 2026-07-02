@@ -1,8 +1,8 @@
 import React, { Fragment, useEffect } from 'react'
 import { Card } from 'react-bootstrap';
 import { CalculateTestTime } from 'ResuableFunctions/CalculateTestTime';
-import useCommonState, { initializeDB, useDispatch } from 'ResuableFunctions/CustomHooks';
-import { handleCloseTestAutomatic, handleCloseTestManual, handleUpdateAnswer, handleUpdateMalpractice } from 'Views/InterviewCandidates/Action/interviewAction';
+import useCommonState, { initializeDB, useCustomNavigate, useDispatch } from 'ResuableFunctions/CustomHooks';
+import { handleCloseTestAutomatic, handleCloseTestEndpoint, handleCloseTestManual, handleUpdateAnswer, handleUpdateMalpractice } from 'Views/InterviewCandidates/Action/interviewAction';
 import { getQuestionFromDb, updateRemainingTestTiming, updateSelectedQuestionIndex } from 'Views/InterviewCandidates/Slice/interviewSlice';
 import ProgressBarComp from 'Components/Progress/ProgressBar';
 import ButtonComponent from 'Components/Button/Button';
@@ -14,6 +14,7 @@ import { updateOverallModalData } from 'Views/Common/Slice/Common_slice';
 const InterviewCandidatesHome = () => {
     const { interviewState, commonState } = useCommonState();
     const dispatch = useDispatch()
+    const navigate = useCustomNavigate();
 
     useEffect(() => {
         const triggerMalpractice = () => {
@@ -127,7 +128,7 @@ const InterviewCandidatesHome = () => {
                             const store = transaction.objectStore(process.env.REACT_APP_INDEXEDDB_DATABASE_STORENAME);
                             const getAllRequest = store.getAll();
                             getAllRequest.onsuccess = function () {
-                                dispatch(handleCloseTestAutomatic({ close: 'automatic', candidate_answers: getAllRequest.result }));
+                                dispatch(handleCloseTestEndpoint(getAllRequest.result, navigate));
                             };
                             getAllRequest.onerror = function (event) {
                                 console.error("Error fetching data from object store:", event.target.error);
@@ -142,7 +143,7 @@ const InterviewCandidatesHome = () => {
 
             return () => clearInterval(timer);
         }
-    }, [interviewState?.test_end_timeStamp, commonState?.involved_in_tab_switching, commonState?.test_over_logout])
+    }, [interviewState?.test_end_timeStamp, commonState?.involved_in_tab_switching, commonState?.test_over_logout, navigate])
 
     return (
         <div className='overflow-hidden applied_brand_color '>
