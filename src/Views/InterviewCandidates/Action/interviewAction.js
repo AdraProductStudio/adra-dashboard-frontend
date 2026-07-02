@@ -1,6 +1,6 @@
 import axiosInstance from "Services/axiosInstance";
 import { handleValidation } from "Views/Common/Action/Common_action";
-import { closeTestMode, malpracticeTestClose, resetModalBox, updateMalpracticeData, updateOverallModalData, updateToast } from "Views/Common/Slice/Common_slice";
+import { closeTestMode, malpracticeTestClose, resetModalBox, updateMalpracticeData, updateToast } from "Views/Common/Slice/Common_slice";
 import {
     updateCandidateData,
     registerCandidateRequest,
@@ -242,13 +242,6 @@ export const handleSubmitProgrammingTest = (params) => async (dispatch) => {
 
         if (data?.error_code === 0) {
             dispatch(programmingTestSubmit({ type: "response", data: data?.data || {} }));
-            dispatch(updateOverallModalData({
-                size: 'xl',
-                from: 'interview_candidate',
-                type: 'test_completed',
-                enable_lg_autoScroll: false
-            }));
-            dispatch(handleEvaluateProgrammingTest({ silent: true }));
             return data?.data || {};
         }
 

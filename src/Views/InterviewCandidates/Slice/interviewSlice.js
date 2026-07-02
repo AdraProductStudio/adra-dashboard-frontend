@@ -28,6 +28,7 @@ const interviewSlice = createSlice({
             evaluation_status: null,
             evaluation: null,
             evaluation_error_message: '',
+            submissions: [],
             questions: []
         }
     },
@@ -267,6 +268,7 @@ const interviewSlice = createSlice({
                     state.programming_test.submit_status = ["Completed", "Malpractice"].includes(data?.status) ? "Completed" : null;
                     state.programming_test.evaluation_status = data?.ai_evaluation?.status || null;
                     state.programming_test.evaluation = data?.ai_evaluation || null;
+                    state.programming_test.submissions = data?.submissions || [];
                     state.programming_test.questions = data?.questions || [];
                     break;
 
@@ -295,6 +297,8 @@ const interviewSlice = createSlice({
                     state.programming_test.submit_spinner = false;
                     state.programming_test.status = data?.status || "Completed";
                     state.programming_test.submit_status = "Completed";
+                    state.programming_test.evaluation_status = data?.ai_evaluation?.status || state.programming_test.evaluation_status;
+                    state.programming_test.submissions = data?.submissions || state.programming_test.submissions;
                     break;
 
                 case "failure":

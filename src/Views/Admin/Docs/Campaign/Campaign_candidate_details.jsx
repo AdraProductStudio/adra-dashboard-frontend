@@ -48,13 +48,29 @@ const Campaign_candidate_details = () => {
     const programmingEvaluationStatus = programmingEvaluation?.status;
     const programmingQuestion = programmingAssessment?.selected_question || {};
     const programmingAnswer = programmingAssessment?.candidate_answer;
+    const programmingSubmissions = Array.isArray(programmingAssessment?.submissions) ? programmingAssessment.submissions : [];
+    const programmingQuestionEvaluations = Array.isArray(programmingEvaluation?.question_evaluations) ? programmingEvaluation.question_evaluations : [];
+    const displayedProgrammingSubmissions = programmingSubmissions.length
+        ? programmingSubmissions
+        : (programmingQuestion?.title || programmingQuestion?.description || programmingAnswer)
+            ? [{
+                question_id: 1,
+                title: programmingQuestion?.title,
+                description: programmingQuestion?.description,
+                candidate_answer: programmingAnswer
+            }]
+            : [];
     const isProgrammingInProgress = programmingStatus === "In Progress";
     const isProgrammingCompleted = programmingStatus === "Completed";
     const isProgrammingEvaluationPending = isProgrammingCompleted && programmingEvaluationStatus === "Pending";
     const isProgrammingEvaluationFailed = isProgrammingCompleted && programmingEvaluationStatus === "Failed";
     const isProgrammingEvaluationCompleted = isProgrammingCompleted && programmingEvaluationStatus === "Completed";
-    const hasProgrammingSubmission = Boolean(programmingQuestion?.title || programmingQuestion?.description || programmingAnswer);
+    const hasProgrammingSubmission = displayedProgrammingSubmissions.length > 0;
     const [programmingRemainingSeconds, setProgrammingRemainingSeconds] = useState(null);
+
+    const getProgrammingQuestionEvaluation = (questionId) => (
+        programmingQuestionEvaluations.find((evaluation) => Number(evaluation?.question_id) === Number(questionId)) || {}
+    );
 
     useEffect(() => {
         dispatch(handleGetIndividualCampaignCandidate({ candidate_id }))
@@ -160,13 +176,6 @@ const Campaign_candidate_details = () => {
 
                                         {hasProgrammingSubmission && (
                                             <Fragment>
-                                                <div className="col-12">
-                                                    <div className='campaign-candidate-card__detail-box h-100'>
-                                                        <div className='campaign-candidate-card__eyebrow mb-1'>Candidate Question</div>
-                                                        <div className='text-dark fw-semibold text-break mb-2'>{programmingQuestion?.title || "-"}</div>
-                                                        <div className='text-secondary text-break'>{programmingQuestion?.description || "-"}</div>
-                                                    </div>
-                                                </div>
                                                 <div className="col-12 col-md-4">
                                                     <div className='campaign-candidate-card__detail-box h-100'>
                                                         <div className='campaign-candidate-card__eyebrow mb-1'>Selected Language</div>
@@ -174,11 +183,47 @@ const Campaign_candidate_details = () => {
                                                     </div>
                                                 </div>
                                                 <div className="col-12">
-                                                    <div className='campaign-candidate-card__detail-box h-100'>
-                                                        <div className='campaign-candidate-card__eyebrow mb-1'>Candidate Answer</div>
-                                                        <pre className='mb-0 text-dark' style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>{programmingAnswer || "-"}</pre>
-                                                    </div>
+                                                    <h6 className='mb-2'>Programming Questions & Answers</h6>
                                                 </div>
+                                                {displayedProgrammingSubmissions.map((submission, index) => {
+                                                    const questionEvaluation = getProgrammingQuestionEvaluation(submission?.question_id);
+                                                    const hasQuestionEvaluation = questionEvaluation?.score !== undefined || questionEvaluation?.grade;
+
+                                                    return (
+                                                        <div className="col-12" key={submission?.question_id || index}>
+                                                            <div className='campaign-candidate-card__detail-box h-100'>
+                                                                <div className='d-flex flex-wrap align-items-start justify-content-between gap-2 mb-2'>
+                                                                    <div>
+                                                                        <div className='campaign-candidate-card__eyebrow mb-1'>Question {index + 1}</div>
+                                                                        <div className='text-dark fw-semibold text-break'>{submission?.title || "-"}</div>
+                                                                    </div>
+                                                                    {hasQuestionEvaluation && (
+                                                                        <div className='d-flex flex-wrap gap-2'>
+                                                                            <span className='interview_candidate_badge test_progress_badge'>
+                                                                                Score: {questionEvaluation?.score ?? 0}/100
+                                                                            </span>
+                                                                            <span className={`interview_candidate_badge ${questionEvaluation?.grade === "Good" ? "test_completed_badge" : questionEvaluation?.grade === "Better" ? "test_progress_badge" : "test_not_started_badge"}`}>
+                                                                                {questionEvaluation?.grade || "Worst"}
+                                                                            </span>
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                                <div className='text-secondary text-break mb-3'>{submission?.description || "-"}</div>
+                                                                {submission?.sample && (
+                                                                    <pre className='mb-3 text-secondary' style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>{submission.sample}</pre>
+                                                                )}
+                                                                <div className='campaign-candidate-card__eyebrow mb-1'>Candidate Answer</div>
+                                                                <pre className='mb-0 text-dark' style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>{submission?.candidate_answer || "Unanswered"}</pre>
+                                                                {questionEvaluation?.feedback && (
+                                                                    <Fragment>
+                                                                        <div className='campaign-candidate-card__eyebrow mt-3 mb-1'>Evaluation Feedback</div>
+                                                                        <div className='text-dark text-break'>{questionEvaluation.feedback}</div>
+                                                                    </Fragment>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })}
                                             </Fragment>
                                         )}
 

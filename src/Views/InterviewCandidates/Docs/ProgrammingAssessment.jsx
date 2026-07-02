@@ -39,36 +39,27 @@ const ProgrammingAssessment = () => {
         () => programmingQuestions[selectedQuestionIndex] || programmingQuestions[0] || {},
         [programmingQuestions, selectedQuestionIndex]
     );
-    const selectedAnswer = answers[selectedQuestion?.id] || '';
+    const selectedQuestionKey = selectedQuestion?.id ?? selectedQuestionIndex;
+    const selectedAnswer = answers[selectedQuestionKey] || '';
     const secondsLeft = programmingTest?.remaining_seconds ?? programmingTest?.duration ?? 300;
+    const isLastQuestion = programmingQuestions.length > 0 && selectedQuestionIndex === programmingQuestions.length - 1;
 
     const getSubmissionPayload = useCallback((submitReason = "manual") => {
-        let questionToSubmit = selectedQuestion;
-        let answerToSubmit = selectedAnswer;
-
-        if (["timeout", "malpractice"].includes(submitReason) && !answerToSubmit) {
-            const firstAnsweredQuestion = programmingQuestions.find((question) => answers[question.id]);
-
-            if (firstAnsweredQuestion) {
-                questionToSubmit = firstAnsweredQuestion;
-                answerToSubmit = answers[firstAnsweredQuestion.id] || '';
-            }
-        }
-
         return {
-            selected_question: {
-                title: questionToSubmit?.title || '',
-                description: questionToSubmit?.description || ''
-            },
             selected_language: selectedLanguage?.value || '',
-            candidate_answer: ["timeout", "malpractice"].includes(submitReason) ? answerToSubmit : answerToSubmit.trim()
+            submit_reason: submitReason,
+            submissions: programmingQuestions.map((question, index) => ({
+                question_id: question?.id ?? index + 1,
+                title: question?.title || '',
+                description: question?.description || '',
+                sample: question?.sample || '',
+                candidate_answer: answers[question?.id ?? index] || ''
+            }))
         };
     }, [
         answers,
         programmingQuestions,
-        selectedAnswer,
-        selectedLanguage?.value,
-        selectedQuestion
+        selectedLanguage?.value
     ]);
 
     const formattedTime = useMemo(() => {
@@ -188,7 +179,7 @@ const ProgrammingAssessment = () => {
             dispatch(updateProgrammingTestRemainingSeconds(0));
             autoSubmittedRef.current = true;
         }
-    }, [hasSubmitted]);
+    }, [dispatch, hasSubmitted]);
 
     useEffect(() => {
         if (!hasSubmitted) return;
@@ -225,12 +216,18 @@ const ProgrammingAssessment = () => {
 
         setAnswers((currentAnswers) => ({
             ...currentAnswers,
-            [selectedQuestion.id]: value || ''
+            [selectedQuestionKey]: value || ''
         }));
     };
 
     const handleManualSubmit = () => {
         submitProgrammingAnswer("manual");
+    };
+
+    const handleQuestionNavigation = (questionIndex) => {
+        if (isRequestInProgress || hasSubmitted) return;
+        if (!programmingQuestions.length) return;
+        setSelectedQuestionIndex(Math.max(0, Math.min(questionIndex, programmingQuestions.length - 1)));
     };
 
     return (
@@ -247,10 +244,10 @@ const ProgrammingAssessment = () => {
                                 {programmingQuestions.map((question, questionInd) => (
                                     <button
                                         type='button'
-                                        className={`programming-question-list__item ${questionInd === selectedQuestionIndex ? 'active' : ''} ${answers[question.id] ? 'answered' : ''}`}
-                                        onClick={() => setSelectedQuestionIndex(questionInd)}
+                                        className={`programming-question-list__item ${questionInd === selectedQuestionIndex ? 'active' : ''} ${(answers[question.id ?? questionInd] || '').trim() ? 'answered' : ''}`}
+                                        onClick={() => handleQuestionNavigation(questionInd)}
                                         disabled={isRequestInProgress || hasSubmitted}
-                                        key={question.id}
+                                        key={question.id ?? questionInd}
                                     >
                                         <span>{questionInd + 1}</span>
                                         <strong>{question.title}</strong>
@@ -340,13 +337,31 @@ const ProgrammingAssessment = () => {
                                     </div>
                                 </div>
                             </Card.Body>
-                            <Card.Footer className='py-4 bg-transparent border-0 d-flex justify-content-end'>
-                                <ButtonComponent
-                                    className='btn-brand px-5'
-                                    buttonName={programmingTest?.submit_spinner ? <SpinnerComponent /> : 'Submit Answer'}
-                                    clickFunction={() => setShowConfirmation(true)}
-                                    btnDisable={!selectedQuestion?.id || !selectedAnswer.trim() || isRequestInProgress || hasSubmitted}
-                                />
+                            <Card.Footer className='py-4 bg-transparent border-0 d-flex flex-wrap'>
+                                <div className='col'>
+                                    <ButtonComponent
+                                        className='btn-brand px-5'
+                                        buttonName='Previous'
+                                        clickFunction={() => handleQuestionNavigation(selectedQuestionIndex - 1)}
+                                        btnDisable={selectedQuestionIndex === 0 || isRequestInProgress || hasSubmitted}
+                                    />
+                                </div>
+                                <div className='col text-end'>
+                                    <ButtonComponent
+                                        className='btn-brand px-5'
+                                        buttonName={
+                                            isLastQuestion
+                                                ? (programmingTest?.submit_spinner ? <SpinnerComponent /> : 'Submit Test')
+                                                : 'Next'
+                                        }
+                                        clickFunction={
+                                            isLastQuestion
+                                                ? () => setShowConfirmation(true)
+                                                : () => handleQuestionNavigation(selectedQuestionIndex + 1)
+                                        }
+                                        btnDisable={!selectedQuestion?.id || isRequestInProgress || hasSubmitted}
+                                    />
+                                </div>
                             </Card.Footer>
                         </Card>
                     </div>
@@ -362,14 +377,14 @@ const ProgrammingAssessment = () => {
             >
                 <Modal.Header closeButton={!isRequestInProgress} className='border-0'>
                     <Modal.Title>
-                        <h6 className='mb-0'>Submit Answer</h6>
+                        <h6 className='mb-0'>Submit Test</h6>
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body className='px-4'>
                     <div className='text-center py-4'>
                         {Icons?.closeTestIcon}
-                        <h5 className='my-3'>Are you sure you want to submit this answer?</h5>
-                        <p className='text-secondary mb-0'>Your answer will be saved before evaluation begins.</p>
+                        <h5 className='my-3'>Are you sure you want to submit this test?</h5>
+                        <p className='text-secondary mb-0'>All 8 questions will be submitted, including unanswered questions.</p>
                     </div>
                 </Modal.Body>
                 <Modal.Footer className='border-0'>
@@ -385,7 +400,7 @@ const ProgrammingAssessment = () => {
                         <div className='col-6 p-1 pb-0'>
                             <ButtonComponent
                                 className='btn-brand w-100 py-2'
-                                buttonName={programmingTest?.submit_spinner ? <SpinnerComponent /> : 'Submit Answer'}
+                                buttonName={programmingTest?.submit_spinner ? <SpinnerComponent /> : 'Submit Test'}
                                 clickFunction={handleManualSubmit}
                                 btnDisable={isRequestInProgress || hasSubmitted}
                             />
