@@ -192,7 +192,15 @@ export function OverallModel() {
                                 clickFunction={adminState?.create_campaign?._id ?
                                     () => dispatch(handleEditCampaign(adminState?.create_campaign))
                                     :
-                                    () => dispatch(handleCreateCampaign({ job_title: adminState?.create_campaign?.job_title, interview_date: adminState?.create_campaign?.interview_date, test_time_duration: adminState?.create_campaign?.test_time_duration, company_flag: adminState?.create_campaign?.company_flag }))}
+                                    () => dispatch(handleCreateCampaign({
+                                        job_title: adminState?.create_campaign?.job_title,
+                                        interview_date: adminState?.create_campaign?.interview_date,
+                                        test_time_duration: adminState?.create_campaign?.test_time_duration,
+                                        company_flag: adminState?.create_campaign?.company_flag,
+                                        assessment_flow: adminState?.create_campaign?.assessment_flow || adminState?.create_campaign?.next_assessment_type || 'programming',
+                                        next_assessment_type: adminState?.create_campaign?.assessment_flow || adminState?.create_campaign?.next_assessment_type || 'programming',
+                                        preparation_duration_seconds: adminState?.create_campaign?.preparation_duration_seconds || 300
+                                    }))}
                             />
                         </div>
 

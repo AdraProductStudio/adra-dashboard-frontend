@@ -5,6 +5,7 @@ import { useDispatch } from 'ResuableFunctions/CustomHooks';
 import IsoStringDateConverter from 'ResuableFunctions/IsoStringDateConverter';
 import Icons from 'Utils/Icons';
 import { updateOverallModalData } from 'Views/Common/Slice/Common_slice';
+import { getAssessmentFlowLabel } from 'Utils/assessmentFlow';
 
 
 const CampaignCard = ({
@@ -64,6 +65,13 @@ const CampaignCard = ({
             icon: Icons.campaign_confirm_candidate_icon,
             title: 'Confirm Candidates',
             value: campaign?.confirmed_candidates || 0
+        },
+        {
+            icon: Icons.interviewIcon,
+            title: 'Assessment Flow',
+            value: getAssessmentFlowLabel(
+                campaign?.assessment_flow || campaign?.next_assessment_type
+            )
         }
     ]
 

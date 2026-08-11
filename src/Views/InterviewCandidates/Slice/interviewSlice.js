@@ -16,10 +16,23 @@ const interviewSlice = createSlice({
         test_end_timeStamp: Cookies.get('log') ? decryptData(Cookies.get('log'))?.testEndOn : '',
         calculate_remaining_time: null,
         submit_test: false,
+        candidate_journey: {
+            spinner: false,
+            loaded: false,
+            assessment_flow: null,
+            next_assessment_type: null,
+            active_assessment_type: null,
+            current_stage: null,
+            preparation_ends_at: null,
+            can_start_assessment: false,
+            server_time: null,
+            error: null
+        },
         programming_test: {
             start_spinner: false,
             submit_spinner: false,
             evaluate_spinner: false,
+            assessment_id: null,
             test_started_on: null,
             duration: 300,
             remaining_seconds: null,
@@ -28,8 +41,36 @@ const interviewSlice = createSlice({
             evaluation_status: null,
             evaluation: null,
             evaluation_error_message: '',
+            assessment_flow: null,
+            next_stage: null,
+            preparation_ends_at: null,
             submissions: [],
             questions: []
+        },
+        qa_test: {
+            start_spinner: false,
+            submit_spinner: false,
+            evaluate_spinner: false,
+            assessment_id: null,
+            status: null,
+            submit_status: null,
+            evaluation_status: null,
+            evaluation_error_message: '',
+            assessment_flow: null,
+            next_stage: null,
+            preparation_ends_at: null,
+            questions: [],
+            answers: [],
+            grid: {
+                maximum_rows: 30,
+                maximum_columns: 10,
+                maximum_cell_characters: 2000
+            },
+            test_started_on: null,
+            test_ends_on: null,
+            server_time: null,
+            duration_seconds: 1800,
+            remaining_seconds: null
         }
     },
     reducers: {
@@ -251,6 +292,40 @@ const interviewSlice = createSlice({
                     break;
             }
         },
+        candidateJourneyStatus(state, action) {
+            const { type, data, message } = action.payload;
+
+            switch (type) {
+                case "request":
+                    state.candidate_journey.spinner = true;
+                    state.candidate_journey.error = null;
+                    break;
+
+                case "response":
+                    state.candidate_journey = {
+                        spinner: false,
+                        loaded: true,
+                        assessment_flow: data?.assessment_flow || data?.next_assessment_type || null,
+                        next_assessment_type: data?.next_assessment_type || null,
+                        active_assessment_type: data?.active_assessment_type || null,
+                        current_stage: data?.current_stage || data?.next_stage || null,
+                        preparation_ends_at: data?.preparation_ends_at || null,
+                        can_start_assessment: Boolean(data?.can_start_assessment),
+                        server_time: data?.server_time || new Date().toISOString(),
+                        error: null
+                    };
+                    break;
+
+                case "failure":
+                    state.candidate_journey.spinner = false;
+                    state.candidate_journey.loaded = true;
+                    state.candidate_journey.error = message || "Unable to load candidate stage";
+                    break;
+
+                default:
+                    break;
+            }
+        },
         programmingTestStart(state, action) {
             const { type, data, message } = action.payload;
 
@@ -262,6 +337,7 @@ const interviewSlice = createSlice({
 
                 case "response":
                     state.programming_test.start_spinner = false;
+                    state.programming_test.assessment_id = data?._id || null;
                     state.programming_test.test_started_on = data?.test_started_on || null;
                     state.programming_test.duration = data?.duration || 300;
                     state.programming_test.status = data?.status || null;
@@ -299,6 +375,9 @@ const interviewSlice = createSlice({
                     state.programming_test.submit_status = "Completed";
                     state.programming_test.evaluation_status = data?.ai_evaluation?.status || state.programming_test.evaluation_status;
                     state.programming_test.submissions = data?.submissions || state.programming_test.submissions;
+                    state.programming_test.assessment_flow = data?.assessment_flow || null;
+                    state.programming_test.next_stage = data?.next_stage || null;
+                    state.programming_test.preparation_ends_at = data?.preparation_ends_at || null;
                     break;
 
                 case "failure":
@@ -330,6 +409,96 @@ const interviewSlice = createSlice({
                     state.programming_test.evaluation_status = "Failed";
                     state.programming_test.evaluation = data?.ai_evaluation || null;
                     state.programming_test.evaluation_error_message = message || "Evaluation unavailable";
+                    break;
+
+                default:
+                    break;
+            }
+        },
+        qaTestStart(state, action) {
+            const { type, data, message } = action.payload;
+
+            switch (type) {
+                case "request":
+                    state.qa_test.start_spinner = true;
+                    state.qa_test.evaluation_error_message = '';
+                    break;
+
+                case "response":
+                    state.qa_test.start_spinner = false;
+                    state.qa_test.assessment_id = data?.assessment_id || null;
+                    state.qa_test.status = data?.status || null;
+                    state.qa_test.submit_status = ["Completed", "Malpractice"].includes(data?.status)
+                        ? "Completed"
+                        : null;
+                    state.qa_test.evaluation_status = data?.evaluation_status || "Pending";
+                    state.qa_test.questions = data?.questions || [];
+                    state.qa_test.answers = data?.answers || [];
+                    state.qa_test.grid = data?.grid || state.qa_test.grid;
+                    state.qa_test.test_started_on = data?.test_started_on || null;
+                    state.qa_test.test_ends_on = data?.test_ends_on || null;
+                    state.qa_test.server_time = data?.server_time || null;
+                    state.qa_test.duration_seconds = data?.duration_seconds || 1800;
+                    break;
+
+                case "failure":
+                    state.qa_test.start_spinner = false;
+                    state.qa_test.evaluation_error_message = message || '';
+                    break;
+
+                default:
+                    break;
+            }
+        },
+        updateQaTestRemainingSeconds(state, action) {
+            state.qa_test.remaining_seconds = action.payload;
+        },
+        qaTestSubmit(state, action) {
+            const { type, data, message } = action.payload;
+
+            switch (type) {
+                case "request":
+                    state.qa_test.submit_spinner = true;
+                    state.qa_test.evaluation_error_message = '';
+                    break;
+
+                case "response":
+                    state.qa_test.submit_spinner = false;
+                    state.qa_test.status = data?.status || "Completed";
+                    state.qa_test.submit_status = "Completed";
+                    state.qa_test.evaluation_status = data?.evaluation_status || state.qa_test.evaluation_status;
+                    state.qa_test.assessment_flow = data?.assessment_flow || null;
+                    state.qa_test.next_stage = data?.next_stage || null;
+                    state.qa_test.preparation_ends_at = data?.preparation_ends_at || null;
+                    break;
+
+                case "failure":
+                    state.qa_test.submit_spinner = false;
+                    state.qa_test.evaluation_error_message = message || '';
+                    break;
+
+                default:
+                    break;
+            }
+        },
+        qaTestEvaluate(state, action) {
+            const { type, data, message } = action.payload;
+
+            switch (type) {
+                case "request":
+                    state.qa_test.evaluate_spinner = true;
+                    state.qa_test.evaluation_error_message = '';
+                    break;
+
+                case "response":
+                    state.qa_test.evaluate_spinner = false;
+                    state.qa_test.evaluation_status = data?.evaluation_status || "Completed";
+                    break;
+
+                case "failure":
+                    state.qa_test.evaluate_spinner = false;
+                    state.qa_test.evaluation_status = data?.evaluation_status || "Failed";
+                    state.qa_test.evaluation_error_message = message || "Evaluation unavailable";
                     break;
 
                 default:
@@ -372,10 +541,15 @@ export const {
     submitTestFailure,
     submitTestRequestSpinner,
     getRegistrationRoles,
+    candidateJourneyStatus,
     programmingTestStart,
     updateProgrammingTestRemainingSeconds,
     programmingTestSubmit,
-    programmingTestEvaluate
+    programmingTestEvaluate,
+    qaTestStart,
+    updateQaTestRemainingSeconds,
+    qaTestSubmit,
+    qaTestEvaluate
 
 } = actions;
 

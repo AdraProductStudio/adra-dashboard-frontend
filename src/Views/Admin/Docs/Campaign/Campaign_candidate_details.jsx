@@ -6,6 +6,7 @@ import React, { Fragment, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom';
 import useCommonState, { useCustomNavigate, useDispatch } from 'ResuableFunctions/CustomHooks'
 import { handleGetIndividualCampaignCandidate } from 'Views/Admin/Action/AdminAction';
+import QaAssessmentDetails from 'Views/Admin/Docs/Campaign/QaAssessmentDetails';
 
 const getProgrammingStatusClass = (status) => {
     if (status === "Completed") return "test_completed_badge";
@@ -53,7 +54,11 @@ const Campaign_candidate_details = () => {
     const dispatch = useDispatch();
     const navigate = useCustomNavigate();
     const { adminState } = useCommonState();
+    const candidateDetails = adminState?.campaign_candidate_details || {};
     const programmingAssessment = adminState?.campaign_candidate_details?.programming_assessment || {};
+    const qaAssessment = candidateDetails?.qa_assessment || {};
+    const isQaFlow = candidateDetails?.assessment_flow === 'qa';
+    const shouldShowQaAssessment = isQaFlow || Boolean(qaAssessment?._id) || candidateDetails?.assessment_type === 'qa';
     const programmingStatus = programmingAssessment?.status || "Not Started";
     const programmingEvaluation = programmingAssessment?.ai_evaluation || {};
     const programmingDuration = programmingAssessment?.duration;
@@ -135,30 +140,42 @@ const Campaign_candidate_details = () => {
                                 <CampaignCandidatesCard data={adminState?.campaign_candidate_details} detail_view={true} card_className="h-100 campaign_candidate_overflow" />
                             </div>
                             <div className="col-8 h-100 campaign_candidate_overflow p-4">
-                                <h6>Assigned Questions</h6>
-                                {adminState?.campaign_candidate_details?.assigned_questions?.map((item, index) => (
-                                    <div className="col-12 py-2 border-bottom" >
-                                        <p>{index + 1} .{item?.question}</p>
-                                        <div className='w-100'>
-                                            {item?.options?.map((val, ind) => (
-                                                <div className='border p-3 my-2 rounded-2 cursor-pointer'>
-                                                    <Checkbox
-                                                        formType="radio"
-                                                        formLabel={val}
-                                                        formValue={item?.answer}
-                                                        name={val}
-                                                        formClassName={`ps-4 test_radio_btn pe-none ${item?.candidate_answer === val ? item?.candidate_answer === item?.answer ? 'text-success' : 'text-danger' : ''}`}
-                                                        formId={index + ind}
-                                                        formName={`question_${index}`}
-                                                        formChecked={item?.candidate_answer === val}
-                                                    />
-                                                </div>
-                                            ))}
+                                {isQaFlow ? (
+                                    <div className="col-12 pb-3 border-bottom">
+                                        <div className='campaign-candidate-card__detail-box'>
+                                            <div className='campaign-candidate-card__eyebrow mb-1'>Assessment Flow</div>
+                                            <div className='text-dark fw-semibold'>QA Assessment → Programming Assessment</div>
+                                            <div className='text-secondary mt-1'>This flow does not include an MCQ round.</div>
                                         </div>
-
-                                        <p className='text-success'>Correct answer: {item?.answer}</p>
                                     </div>
-                                ))}
+                                ) : (
+                                    <Fragment>
+                                        <h6>Assigned Questions</h6>
+                                        {adminState?.campaign_candidate_details?.assigned_questions?.map((item, index) => (
+                                            <div className="col-12 py-2 border-bottom" key={item?._id || index}>
+                                                <p>{index + 1} .{item?.question}</p>
+                                                <div className='w-100'>
+                                                    {item?.options?.map((val, ind) => (
+                                                        <div className='border p-3 my-2 rounded-2 cursor-pointer' key={`${index}-${ind}`}>
+                                                            <Checkbox
+                                                                formType="radio"
+                                                                formLabel={val}
+                                                                formValue={item?.answer}
+                                                                name={val}
+                                                                formClassName={`ps-4 test_radio_btn pe-none ${item?.candidate_answer === val ? item?.candidate_answer === item?.answer ? 'text-success' : 'text-danger' : ''}`}
+                                                                formId={index + ind}
+                                                                formName={`question_${index}`}
+                                                                formChecked={item?.candidate_answer === val}
+                                                            />
+                                                        </div>
+                                                    ))}
+                                                </div>
+
+                                                <p className='text-success'>Correct answer: {item?.answer}</p>
+                                            </div>
+                                        ))}
+                                    </Fragment>
+                                )}
 
                                 <div className="col-12 py-3 border-bottom">
                                     <div className='d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3'>
@@ -301,6 +318,10 @@ const Campaign_candidate_details = () => {
                                         )}
                                     </div>
                                 </div>
+
+                                {shouldShowQaAssessment ? (
+                                    <QaAssessmentDetails qaAssessment={qaAssessment} />
+                                ) : null}
 
                             </div>
                         </div>

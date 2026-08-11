@@ -6,9 +6,15 @@ import InterviewCandidatesHeader from 'Components/Panel_compnent/InterviewCandid
 import SpinnerComponent from 'Components/Spinner/Spinner';
 import Icons from 'Utils/Icons';
 import useCommonState, { useDispatch } from 'ResuableFunctions/CustomHooks';
-import { handleCloseProgrammingTestMalpractice, handleEvaluateProgrammingTest, handleStartProgrammingTest, handleSubmitProgrammingTest, handleUpdateMalpractice } from 'Views/InterviewCandidates/Action/interviewAction';
+import { handleCloseProgrammingTestMalpractice, handleEvaluateProgrammingTest, handleGetCandidateCurrentStage, handleStartProgrammingTest, handleSubmitProgrammingTest, handleUpdateMalpractice } from 'Views/InterviewCandidates/Action/interviewAction';
 import { updateProgrammingTestRemainingSeconds } from 'Views/InterviewCandidates/Slice/interviewSlice';
 import { updateOverallModalData } from 'Views/Common/Slice/Common_slice';
+import { CANDIDATE_STAGES } from 'Views/InterviewCandidates/candidateStageRoutes';
+import {
+    deleteProgrammingAssessmentDraft,
+    getProgrammingAssessmentDraft,
+    saveProgrammingAssessmentDraft
+} from 'Views/InterviewCandidates/programmingAssessmentDraftDb';
 
 const programmingLanguages = [
     { label: 'JavaScript', value: 'javascript' },
@@ -16,6 +22,26 @@ const programmingLanguages = [
     { label: 'Java', value: 'java' },
     { label: 'Python', value: 'python' }
 ];
+
+const buildServerAnswers = (submissions) => (
+    (submissions || []).reduce((serverAnswers, submission) => {
+        if (submission?.question_id !== undefined) {
+            serverAnswers[submission.question_id] = typeof submission?.candidate_answer === 'string'
+                ? submission.candidate_answer
+                : '';
+        }
+        return serverAnswers;
+    }, {})
+);
+
+const normalizeDraftAnswers = (draftAnswers, questions) => (
+    (questions || []).reduce((normalizedAnswers, question, index) => {
+        const questionKey = question?.id ?? index;
+        const answer = draftAnswers?.[questionKey];
+        if (typeof answer === 'string') normalizedAnswers[questionKey] = answer;
+        return normalizedAnswers;
+    }, {})
+);
 
 const ProgrammingAssessment = () => {
     const { interviewState, commonState } = useCommonState();
@@ -25,6 +51,10 @@ const ProgrammingAssessment = () => {
     const isRequestInProgress = programmingTest?.start_spinner || programmingTest?.submit_spinner;
     const isMalpracticeStatus = programmingTest?.status === "Malpractice";
     const hasSubmitted = programmingTest?.submit_status === "Completed" || programmingTest?.status === "Completed" || isMalpracticeStatus;
+    const continuesToQaAssessment = (
+        programmingTest?.assessment_flow === 'qa' &&
+        programmingTest?.next_stage === CANDIDATE_STAGES.QA_PREPARATION
+    );
     const autoSubmittedRef = useRef(false);
     const completionModalShownRef = useRef(false);
     const backgroundEvaluationStartedRef = useRef(false);
@@ -33,6 +63,7 @@ const ProgrammingAssessment = () => {
     const [selectedQuestionIndex, setSelectedQuestionIndex] = useState(0);
     const [answers, setAnswers] = useState({});
     const [selectedLanguage, setSelectedLanguage] = useState(programmingLanguages[0]);
+    const [draftReady, setDraftReady] = useState(false);
     const [showConfirmation, setShowConfirmation] = useState(false);
 
     const selectedQuestion = useMemo(
@@ -69,12 +100,25 @@ const ProgrammingAssessment = () => {
         return `${minutes} : ${seconds}`;
     }, [secondsLeft]);
 
-    const submitProgrammingAnswer = useCallback((submitReason = "manual") => {
+    const submitProgrammingAnswer = useCallback(async (submitReason = "manual") => {
         if (programmingTest?.submit_spinner || hasSubmitted) return;
 
         setShowConfirmation(false);
 
-        dispatch(handleSubmitProgrammingTest(getSubmissionPayload(submitReason)));
+        const response = await dispatch(
+            handleSubmitProgrammingTest(getSubmissionPayload(submitReason))
+        );
+
+        if (
+            response?.assessment_flow === 'qa' &&
+            response?.next_stage === CANDIDATE_STAGES.QA_PREPARATION
+        ) {
+            if (response?.ai_evaluation?.status === 'Pending') {
+                backgroundEvaluationStartedRef.current = true;
+                dispatch(handleEvaluateProgrammingTest({ silent: true }));
+            }
+            await dispatch(handleGetCandidateCurrentStage());
+        }
     }, [
         dispatch,
         getSubmissionPayload,
@@ -134,6 +178,7 @@ const ProgrammingAssessment = () => {
     }, [
         commonState?.involved_in_tab_switching,
         commonState?.test_over_logout,
+        dispatch,
         getSubmissionPayload,
         hasSubmitted,
         programmingTest?.submit_spinner
@@ -143,6 +188,82 @@ const ProgrammingAssessment = () => {
         dispatch(handleStartProgrammingTest());
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    useEffect(() => {
+        if (!programmingTest?.assessment_id || !programmingQuestions.length) return;
+
+        let isCancelled = false;
+        setDraftReady(false);
+
+        const hydrateDraft = async () => {
+            const serverAnswers = buildServerAnswers(programmingTest?.submissions);
+
+            try {
+                const draft = await getProgrammingAssessmentDraft(programmingTest.assessment_id);
+                if (isCancelled) return;
+
+                setAnswers({
+                    ...serverAnswers,
+                    ...normalizeDraftAnswers(draft?.answers, programmingQuestions)
+                });
+
+                const restoredLanguage = programmingLanguages.find((language) => (
+                    language.label === draft?.selected_language?.label &&
+                    language.value === draft?.selected_language?.value
+                ));
+                setSelectedLanguage(restoredLanguage || programmingLanguages[0]);
+
+                const restoredQuestionIndex = Number(draft?.selected_question_index);
+                setSelectedQuestionIndex(
+                    Number.isInteger(restoredQuestionIndex)
+                        ? Math.max(0, Math.min(restoredQuestionIndex, programmingQuestions.length - 1))
+                        : 0
+                );
+            } catch (error) {
+                if (!isCancelled) {
+                    setAnswers(serverAnswers);
+                    setSelectedLanguage(programmingLanguages[0]);
+                    setSelectedQuestionIndex(0);
+                }
+                console.error('Unable to restore programming assessment draft:', error);
+            } finally {
+                if (!isCancelled) setDraftReady(true);
+            }
+        };
+
+        hydrateDraft();
+        return () => {
+            isCancelled = true;
+        };
+    }, [
+        programmingQuestions,
+        programmingTest?.assessment_id,
+        programmingTest?.submissions
+    ]);
+
+    useEffect(() => {
+        if (!draftReady || !programmingTest?.assessment_id || hasSubmitted) return;
+
+        const saveTimer = window.setTimeout(() => {
+            saveProgrammingAssessmentDraft({
+                assessmentId: programmingTest.assessment_id,
+                answers,
+                selectedLanguage,
+                selectedQuestionIndex
+            }).catch((error) => {
+                console.error('Unable to save programming assessment draft:', error);
+            });
+        }, 500);
+
+        return () => window.clearTimeout(saveTimer);
+    }, [
+        answers,
+        draftReady,
+        hasSubmitted,
+        programmingTest?.assessment_id,
+        selectedLanguage,
+        selectedQuestionIndex
+    ]);
 
     useEffect(() => {
         if (!programmingTest?.test_started_on || hasSubmitted) return;
@@ -168,6 +289,7 @@ const ProgrammingAssessment = () => {
 
         return () => clearInterval(timer);
     }, [
+        dispatch,
         hasSubmitted,
         programmingTest?.duration,
         programmingTest?.test_started_on,
@@ -178,12 +300,19 @@ const ProgrammingAssessment = () => {
         if (hasSubmitted) {
             dispatch(updateProgrammingTestRemainingSeconds(0));
             autoSubmittedRef.current = true;
+
+            if (programmingTest?.assessment_id) {
+                deleteProgrammingAssessmentDraft(programmingTest.assessment_id).catch((error) => {
+                    console.error('Unable to remove submitted programming assessment draft:', error);
+                });
+            }
         }
-    }, [dispatch, hasSubmitted]);
+    }, [dispatch, hasSubmitted, programmingTest?.assessment_id]);
 
     useEffect(() => {
         if (!hasSubmitted) return;
         if (isMalpracticeStatus || commonState?.test_over_logout === 'malpracticed_again') return;
+        if (continuesToQaAssessment) return;
 
         if (!completionModalShownRef.current) {
             completionModalShownRef.current = true;
@@ -205,6 +334,8 @@ const ProgrammingAssessment = () => {
         }
     }, [
         commonState?.test_over_logout,
+        continuesToQaAssessment,
+        dispatch,
         hasSubmitted,
         isMalpracticeStatus,
         programmingTest?.evaluate_spinner,

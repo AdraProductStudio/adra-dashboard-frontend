@@ -18,14 +18,19 @@ import {
     submitTestRequestSpinner,
     updateTimeOverCloseTest,
     getRegistrationRoles,
+    candidateJourneyStatus,
     programmingTestStart,
     programmingTestSubmit,
-    programmingTestEvaluate
+    programmingTestEvaluate,
+    qaTestStart,
+    qaTestSubmit,
+    qaTestEvaluate
 
 } from "Views/InterviewCandidates/Slice/interviewSlice";
 import { IndexedDbDeleteFun } from "Views/InterviewCandidates/IndexedDbDeleteFun";
 import { initializeDB } from "ResuableFunctions/CustomHooks";
 import { exitFullScreen, handleFullScreen } from "ResuableFunctions/fullscreenmode";
+import { getCandidateStageRoute } from "Views/InterviewCandidates/candidateStageRoutes";
 
 //                                                                 candidate registration on change 
 export const handleInterviewRegistrationOnChange = ipVal => dispatch => {
@@ -194,12 +199,35 @@ export const handleCloseTestEndpoint = (candidate_answers, navigate) => async di
             dispatch(submitFirstAssessmentResponse())
             dispatch(resetModalBox())
             IndexedDbDeleteFun();
-            if (navigate) navigate("/candidates_home/programming-preparation", { replace: true });
+            dispatch(candidateJourneyStatus({ type: "response", data: data?.data || {} }));
+
+            const nextRoute = getCandidateStageRoute(data?.data?.next_stage);
+            if (navigate && nextRoute) navigate(nextRoute, { replace: true });
         }
         else dispatch(submitTestFailure(data?.message))
     }
     catch (Err) {
         dispatch(submitTestFailure(Err?.message))
+    }
+}
+
+export const handleGetCandidateCurrentStage = () => async (dispatch) => {
+    try {
+        dispatch(candidateJourneyStatus({ type: "request" }));
+        const { data } = await axiosInstance.get("/candidate/current-stage");
+
+        if (data?.error_code === 0) {
+            dispatch(candidateJourneyStatus({ type: "response", data: data?.data || {} }));
+            return data?.data || {};
+        }
+
+        const message = data?.message || "Unable to load candidate stage";
+        dispatch(candidateJourneyStatus({ type: "failure", message }));
+        return null;
+    } catch (Err) {
+        const message = Err?.message || "Unable to load candidate stage";
+        dispatch(candidateJourneyStatus({ type: "failure", message }));
+        return null;
     }
 }
 
@@ -307,6 +335,88 @@ export const handleEvaluateProgrammingTest = ({ silent = false } = {}) => async 
         if (!silent) {
             dispatch(updateToast({
                 message: "Your solution has been submitted successfully. The evaluation is currently unavailable and will be processed shortly.",
+                type: "error"
+            }));
+        }
+        return null;
+    }
+}
+
+export const handleStartQaTest = () => async (dispatch) => {
+    try {
+        dispatch(qaTestStart({ type: "request" }));
+        const { data } = await axiosInstance.post("/qa-test/start");
+
+        if (data?.error_code === 0) {
+            dispatch(qaTestStart({ type: "response", data: data?.data || {} }));
+            return data?.data || {};
+        }
+
+        dispatch(qaTestStart({ type: "failure", message: data?.message }));
+        dispatch(updateToast({ message: data?.message || "Unable to start QA assessment", type: "error" }));
+        return null;
+    } catch (Err) {
+        const message = Err?.message || "Unable to start QA assessment";
+        dispatch(qaTestStart({ type: "failure", message }));
+        dispatch(updateToast({ message, type: "error" }));
+        return null;
+    }
+}
+
+export const handleSubmitQaTest = (params) => async (dispatch) => {
+    try {
+        dispatch(qaTestSubmit({ type: "request" }));
+        const { data } = await axiosInstance.post("/qa-test/submit", params);
+
+        if (data?.error_code === 0) {
+            dispatch(qaTestSubmit({ type: "response", data: data?.data || {} }));
+            return data?.data || {};
+        }
+
+        dispatch(qaTestSubmit({ type: "failure", message: data?.message }));
+        dispatch(updateToast({ message: data?.message || "Unable to submit QA assessment", type: "error" }));
+        return null;
+    } catch (Err) {
+        const message = Err?.message || "Unable to submit QA assessment";
+        dispatch(qaTestSubmit({ type: "failure", message }));
+        dispatch(updateToast({ message, type: "error" }));
+        return null;
+    }
+}
+
+export const handleCloseQaTestMalpractice = (params) => async (dispatch) => {
+    exitFullScreen();
+    dispatch(malpracticeTestClose());
+    return dispatch(handleSubmitQaTest({ ...params, submit_reason: "malpractice" }));
+}
+
+export const handleEvaluateQaTest = ({ silent = false } = {}) => async (dispatch) => {
+    try {
+        dispatch(qaTestEvaluate({ type: "request" }));
+        const { data } = await axiosInstance.post("/qa-test/evaluate");
+
+        if (data?.error_code === 0) {
+            dispatch(qaTestEvaluate({ type: "response", data: data?.data || {} }));
+            if (!silent) {
+                dispatch(updateToast({ message: data?.message || "QA assessment evaluated successfully", type: "success" }));
+            }
+            return data?.data || {};
+        }
+
+        dispatch(qaTestEvaluate({ type: "failure", data: data?.data || {}, message: data?.message }));
+        if (!silent) {
+            dispatch(updateToast({
+                message: "Your QA assessment is saved. Evaluation will be processed shortly.",
+                type: "error"
+            }));
+        }
+        return data?.data || null;
+    } catch (Err) {
+        const message = Err?.message || "Evaluation unavailable";
+        dispatch(qaTestEvaluate({ type: "failure", message }));
+        if (!silent) {
+            dispatch(updateToast({
+                message: "Your QA assessment is saved. Evaluation will be processed shortly.",
                 type: "error"
             }));
         }

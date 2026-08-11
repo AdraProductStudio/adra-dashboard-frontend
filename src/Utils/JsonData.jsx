@@ -5,6 +5,12 @@ import { handleInterviewRegistrationOnChange } from 'Views/InterviewCandidates/A
 import { handleCreateCampaignOnChnage } from 'Views/Admin/Action/AdminAction';
 import { assignQuestionTypes } from 'Views/Admin/Slice/AdminSlice';
 import { updateFellowshipCandidatesData, updateToast } from 'Views/Common/Slice/Common_slice';
+import {
+    ASSESSMENT_FLOWS,
+    ASSESSMENT_FLOW_OPTIONS,
+    getAssessmentFlowFromOption,
+    getAssessmentFlowOption
+} from 'Utils/assessmentFlow';
 
 const readFile = (file) => {
     return new Promise((resolve, reject) => {
@@ -618,7 +624,7 @@ const JsonData = () => {
                 Err: commonState?.validated && !adminState?.create_campaign?.interview_date ? "Interview date required" : ''
             },
             {
-                name: "Test time duration (in mins)",
+                name: "MCQ test time duration (in mins)",
                 type: "text",
                 is_min: true,
                 category: "input",
@@ -630,8 +636,56 @@ const JsonData = () => {
                         dispatch(handleCreateCampaignOnChnage({ test_time_duration: e.target.value }))
                     }
                 },
+                isMandatory: (adminState?.create_campaign?.assessment_flow || adminState?.create_campaign?.next_assessment_type || ASSESSMENT_FLOWS.PROGRAMMING) !== ASSESSMENT_FLOWS.QA,
+                disabled: (adminState?.create_campaign?.assessment_flow || adminState?.create_campaign?.next_assessment_type) === ASSESSMENT_FLOWS.QA,
+                Err: commonState?.validated &&
+                    (adminState?.create_campaign?.assessment_flow || adminState?.create_campaign?.next_assessment_type || ASSESSMENT_FLOWS.PROGRAMMING) !== ASSESSMENT_FLOWS.QA &&
+                    !adminState?.create_campaign?.test_time_duration
+                    ? "MCQ test time duration required"
+                    : ''
+            },
+            {
+                name: "Assessment flow",
+                type: "normal_select",
+                category: "select",
+                placeholder: "",
+                divClassName: 'col-12 p-1',
+                value: getAssessmentFlowOption(
+                    adminState?.create_campaign?.assessment_flow ||
+                    adminState?.create_campaign?.next_assessment_type
+                ),
+                options: ASSESSMENT_FLOW_OPTIONS,
+                change: (e) => {
+                    const assessmentFlow = getAssessmentFlowFromOption(e.target.value);
+                    dispatch(handleCreateCampaignOnChnage({
+                        assessment_flow: assessmentFlow,
+                        next_assessment_type: assessmentFlow
+                    }));
+                },
                 isMandatory: true,
-                Err: commonState?.validated && !adminState?.create_campaign?.test_time_duration ? "Test time duration required" : ''
+                Err: ''
+            },
+            {
+                name: (adminState?.create_campaign?.assessment_flow || adminState?.create_campaign?.next_assessment_type) === ASSESSMENT_FLOWS.QA
+                    ? "Programming preparation time after QA (in seconds)"
+                    : "Preparation time (in seconds)",
+                type: "text",
+                category: "input",
+                placeholder: "",
+                divClassName: 'col-12 p-1',
+                value: adminState?.create_campaign?.preparation_duration_seconds ?? 300,
+                change: (e) => {
+                    if (/^\d*$/.test(e.target.value)) {
+                        dispatch(handleCreateCampaignOnChnage({ preparation_duration_seconds: e.target.value }))
+                    }
+                },
+                isMandatory: (adminState?.create_campaign?.assessment_flow || adminState?.create_campaign?.next_assessment_type) !== ASSESSMENT_FLOWS.NONE,
+                disabled: (adminState?.create_campaign?.assessment_flow || adminState?.create_campaign?.next_assessment_type) === ASSESSMENT_FLOWS.NONE,
+                Err: commonState?.validated &&
+                    (adminState?.create_campaign?.assessment_flow || adminState?.create_campaign?.next_assessment_type) !== ASSESSMENT_FLOWS.NONE &&
+                    !adminState?.create_campaign?.preparation_duration_seconds
+                    ? "Preparation time required"
+                    : ''
             },
         ],
 
