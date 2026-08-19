@@ -400,14 +400,14 @@ const interviewSlice = createSlice({
 
                 case "response":
                     state.programming_test.evaluate_spinner = false;
-                    state.programming_test.evaluation_status = data?.ai_evaluation?.status || "Completed";
-                    state.programming_test.evaluation = data?.ai_evaluation || null;
+                    state.programming_test.evaluation_status = data?.evaluation_status || data?.ai_evaluation?.status || "Completed";
+                    state.programming_test.evaluation = data?.ai_evaluation || state.programming_test.evaluation;
                     break;
 
                 case "failure":
                     state.programming_test.evaluate_spinner = false;
-                    state.programming_test.evaluation_status = "Failed";
-                    state.programming_test.evaluation = data?.ai_evaluation || null;
+                    state.programming_test.evaluation_status = data?.evaluation_status || "Failed";
+                    state.programming_test.evaluation = data?.ai_evaluation || state.programming_test.evaluation;
                     state.programming_test.evaluation_error_message = message || "Evaluation unavailable";
                     break;
 

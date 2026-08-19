@@ -141,6 +141,8 @@ const CampaignCandidatesCard = ({
         return grade;
     }
 
+    const activeEvaluationStatuses = ["Pending", "Queued", "Processing", "In Progress"];
+
     const isQaFlow = data?.assessment_flow === 'qa';
     const showTimer = !isQaFlow && data?.status !== "Test Completed" && timeLeft !== "Test time is over" && data?.status !== "malpractice";
     const scoreValue = test_score(data?.test_score);
@@ -151,7 +153,7 @@ const CampaignCandidatesCard = ({
     const showProgrammingStatus = programmingStatus && programmingStatus !== "Not Started";
     const showProgrammingTimer = programmingStatus === "In Progress" && programmingTimeLeft && programmingTimeLeft !== "Test time is over";
     const showProgrammingResult = programmingStatus === "Completed" || programmingEvaluation?.status === "Completed";
-    const programmingGradeValue = programmingGrade ? programming_grade_label(programmingGrade) : (programmingEvaluation?.status === "Pending" ? "Pending" : "-");
+    const programmingGradeValue = programmingGrade ? programming_grade_label(programmingGrade) : (activeEvaluationStatuses.includes(programmingEvaluation?.status) ? "Pending" : "-");
     const programmingScoreValue = programmingScore !== null && programmingScore !== undefined ? `${programmingScore}/100` : null;
     const qaAssessment = data?.qa_assessment || {};
     const qaStatus = qaAssessment?.status;
@@ -159,7 +161,7 @@ const CampaignCandidatesCard = ({
     const showQaStatus = isQaFlow && qaStatus && qaStatus !== "Not Started";
     const showQaResult = isQaFlow && (qaStatus === "Completed" || qaEvaluation?.status === "Completed");
     const qaGradeValue = qaEvaluation?.grade ? programming_grade_label(qaEvaluation.grade) : (
-        ["Pending", "In Progress"].includes(qaEvaluation?.status)
+        activeEvaluationStatuses.includes(qaEvaluation?.status)
             ? "Pending"
             : "-"
     );

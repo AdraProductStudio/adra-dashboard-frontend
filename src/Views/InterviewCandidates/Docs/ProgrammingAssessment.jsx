@@ -6,7 +6,7 @@ import InterviewCandidatesHeader from 'Components/Panel_compnent/InterviewCandid
 import SpinnerComponent from 'Components/Spinner/Spinner';
 import Icons from 'Utils/Icons';
 import useCommonState, { useDispatch } from 'ResuableFunctions/CustomHooks';
-import { handleCloseProgrammingTestMalpractice, handleEvaluateProgrammingTest, handleGetCandidateCurrentStage, handleStartProgrammingTest, handleSubmitProgrammingTest, handleUpdateMalpractice } from 'Views/InterviewCandidates/Action/interviewAction';
+import { handleCloseProgrammingTestMalpractice, handleGetCandidateCurrentStage, handleStartProgrammingTest, handleSubmitProgrammingTest, handleUpdateMalpractice } from 'Views/InterviewCandidates/Action/interviewAction';
 import { updateProgrammingTestRemainingSeconds } from 'Views/InterviewCandidates/Slice/interviewSlice';
 import { updateOverallModalData } from 'Views/Common/Slice/Common_slice';
 import { CANDIDATE_STAGES } from 'Views/InterviewCandidates/candidateStageRoutes';
@@ -57,7 +57,6 @@ const ProgrammingAssessment = () => {
     );
     const autoSubmittedRef = useRef(false);
     const completionModalShownRef = useRef(false);
-    const backgroundEvaluationStartedRef = useRef(false);
     const malpracticeTriggeredRef = useRef(false);
 
     const [selectedQuestionIndex, setSelectedQuestionIndex] = useState(0);
@@ -113,10 +112,6 @@ const ProgrammingAssessment = () => {
             response?.assessment_flow === 'qa' &&
             response?.next_stage === CANDIDATE_STAGES.QA_PREPARATION
         ) {
-            if (response?.ai_evaluation?.status === 'Pending') {
-                backgroundEvaluationStartedRef.current = true;
-                dispatch(handleEvaluateProgrammingTest({ silent: true }));
-            }
             await dispatch(handleGetCandidateCurrentStage());
         }
     }, [
@@ -324,22 +319,11 @@ const ProgrammingAssessment = () => {
             }));
         }
 
-        if (
-            programmingTest?.evaluation_status === "Pending" &&
-            !programmingTest?.evaluate_spinner &&
-            !backgroundEvaluationStartedRef.current
-        ) {
-            backgroundEvaluationStartedRef.current = true;
-            dispatch(handleEvaluateProgrammingTest({ silent: true }));
-        }
     }, [
         commonState?.test_over_logout,
         continuesToQaAssessment,
-        dispatch,
         hasSubmitted,
-        isMalpracticeStatus,
-        programmingTest?.evaluate_spinner,
-        programmingTest?.evaluation_status
+        isMalpracticeStatus
     ]);
 
     const handleAnswerChange = (value) => {

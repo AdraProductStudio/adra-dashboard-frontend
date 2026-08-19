@@ -15,7 +15,7 @@ const CandidateStageRoute = ({ allowedStages, children }) => {
 
     useEffect(() => {
         dispatch(handleGetCandidateCurrentStage());
-    }, [dispatch]);
+    }, []);
 
     if (!journey.loaded || journey.spinner) {
         return (

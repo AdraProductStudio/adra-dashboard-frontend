@@ -20,6 +20,8 @@ const getGradeClass = (grade) => {
     return 'test_not_started_badge';
 };
 
+const ACTIVE_EVALUATION_STATUSES = ['Pending', 'Queued', 'Processing', 'In Progress'];
+
 const getColumnName = (columnIndex) => {
     let value = columnIndex + 1;
     let name = '';
@@ -287,7 +289,7 @@ const QaAssessmentDetails = ({ qaAssessment = {} }) => {
                         <div className='campaign-candidate-card__detail-box h-100'>
                             <div className='campaign-candidate-card__eyebrow mb-1'>AI Evaluation Status</div>
                             <div className={`fw-semibold ${evaluation?.status === 'Failed' ? 'text-danger' : 'text-dark'}`}>
-                                {evaluation?.status === 'Pending' || evaluation?.status === 'In Progress'
+                                {ACTIVE_EVALUATION_STATUSES.includes(evaluation?.status)
                                     ? 'AI Evaluation in Progress'
                                     : evaluation?.status || '-'}
                             </div>

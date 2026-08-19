@@ -6,7 +6,6 @@ import Icons from 'Utils/Icons';
 import useCommonState, { useDispatch } from 'ResuableFunctions/CustomHooks';
 import {
     handleCloseQaTestMalpractice,
-    handleEvaluateQaTest,
     handleGetCandidateCurrentStage,
     handleStartQaTest,
     handleSubmitQaTest,
@@ -123,7 +122,6 @@ const QAAssessment = () => {
     const idempotencyKeyRef = useRef(null);
     const autoSubmittedRef = useRef(false);
     const completionModalShownRef = useRef(false);
-    const backgroundEvaluationStartedRef = useRef(false);
     const malpracticeTriggeredRef = useRef(false);
 
     const selectedQuestion = questions[selectedQuestionIndex] || questions[0] || {};
@@ -251,10 +249,6 @@ const QAAssessment = () => {
             response?.assessment_flow === 'qa' &&
             response?.next_stage === CANDIDATE_STAGES.PROGRAMMING_PREPARATION
         ) {
-            if (response?.evaluation_status === 'Pending') {
-                backgroundEvaluationStartedRef.current = true;
-                dispatch(handleEvaluateQaTest({ silent: true }));
-            }
             await dispatch(handleGetCandidateCurrentStage());
         }
 
@@ -372,15 +366,6 @@ const QAAssessment = () => {
 
         if (qaTest?.status === 'Malpractice') return;
 
-        if (
-            qaTest?.evaluation_status === 'Pending' &&
-            !qaTest?.evaluate_spinner &&
-            !backgroundEvaluationStartedRef.current
-        ) {
-            backgroundEvaluationStartedRef.current = true;
-            dispatch(handleEvaluateQaTest({ silent: true }));
-        }
-
         if (continuesToProgrammingAssessment) return;
 
         if (!completionModalShownRef.current) {
@@ -397,8 +382,6 @@ const QAAssessment = () => {
         dispatch,
         hasSubmitted,
         qaTest?.assessment_id,
-        qaTest?.evaluate_spinner,
-        qaTest?.evaluation_status,
         qaTest?.status
     ]);
 

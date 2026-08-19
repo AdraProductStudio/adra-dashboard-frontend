@@ -49,6 +49,8 @@ const getProgrammingGradeClass = (grade) => {
     return "test_not_started_badge";
 };
 
+const ACTIVE_EVALUATION_STATUSES = ["Pending", "Queued", "Processing", "In Progress"];
+
 const Campaign_candidate_details = () => {
     const { campaign_id, candidate_id } = useParams();
     const dispatch = useDispatch();
@@ -80,7 +82,7 @@ const Campaign_candidate_details = () => {
             : [];
     const isProgrammingInProgress = programmingStatus === "In Progress";
     const isProgrammingCompleted = programmingStatus === "Completed";
-    const isProgrammingEvaluationPending = isProgrammingCompleted && programmingEvaluationStatus === "Pending";
+    const isProgrammingEvaluationPending = isProgrammingCompleted && ACTIVE_EVALUATION_STATUSES.includes(programmingEvaluationStatus);
     const isProgrammingEvaluationFailed = isProgrammingCompleted && programmingEvaluationStatus === "Failed";
     const isProgrammingEvaluationCompleted = isProgrammingCompleted && programmingEvaluationStatus === "Completed";
     const hasProgrammingSubmission = displayedProgrammingSubmissions.length > 0;
