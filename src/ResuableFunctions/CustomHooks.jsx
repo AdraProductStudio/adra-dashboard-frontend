@@ -44,13 +44,7 @@ export const CustomUseLocationHook = () => {
 
 //                                                     use dispatch hook                                                                     //
 export const useDispatch = () => {
-  const dispatch = useReduxDispatch();
-
-  const customDispatch = (action) => {
-    return dispatch(action);
-  };
-
-  return customDispatch;
+  return useReduxDispatch();
 };
 
 //                                                    copyToClipboard                                                                        //

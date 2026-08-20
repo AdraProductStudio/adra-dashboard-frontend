@@ -1,10 +1,10 @@
-import React, { Fragment, useEffect, useState } from 'react'
+import React, { Fragment, useEffect, useRef, useState } from 'react'
 import ButtonComponent from 'Components/Button/Button'
 import Img from 'Components/Img/Img'
 import Image from 'Utils/Image'
-import { updateOverallModalData } from 'Views/Common/Slice/Common_slice'
+import { updateOverallModalData, updateToast } from 'Views/Common/Slice/Common_slice'
 import useCommonState, { useCustomNavigate, useDispatch } from 'ResuableFunctions/CustomHooks'
-import { handleGetCampaign } from '../../Action/AdminAction'
+import { handleGetCampaign, handleUploadMcqQuestions } from '../../Action/AdminAction'
 import CampaignCard from 'Components/Card/CampaignCard'
 
 const Campaign = () => {
@@ -12,6 +12,8 @@ const Campaign = () => {
     const { adminState } = useCommonState();
     const navigate = useCustomNavigate();
     const [activeCompanyFilter, setActiveCompanyFilter] = useState('Applied Automation Systems');
+    const [isUploadingMcq, setIsUploadingMcq] = useState(false);
+    const mcqFileInputRef = useRef(null);
 
     const campaigns = adminState?.campaigns_data?.campaign || [];
     const companyFilters = ['Applied Automation Systems', 'Adra Product Studio'];
@@ -24,6 +26,23 @@ const Campaign = () => {
     useEffect(() => {
         dispatch(handleGetCampaign())
     }, [])
+
+    const handleMcqFileChange = async (event) => {
+        const file = event.target.files?.[0];
+
+        if (!file) return;
+
+        if (!file.name.toLowerCase().endsWith('.csv')) {
+            dispatch(updateToast({ message: 'Please upload a CSV file', type: 'error' }));
+            event.target.value = '';
+            return;
+        }
+
+        setIsUploadingMcq(true);
+        await dispatch(handleUploadMcqQuestions(file));
+        setIsUploadingMcq(false);
+        event.target.value = '';
+    }
 
     return (
         <Fragment>
@@ -39,6 +58,21 @@ const Campaign = () => {
                         </div>
                 }
                 <div className="campaign_header_action">
+                    <input
+                        ref={mcqFileInputRef}
+                        type="file"
+                        accept=".csv,text/csv"
+                        className="d-none"
+                        aria-label="Upload MCQ questions CSV"
+                        onChange={handleMcqFileChange}
+                    />
+                    <ButtonComponent
+                        type="button"
+                        buttonName={isUploadingMcq ? 'Uploading...' : 'Upload MCQ'}
+                        className="btn btn-outline-secondary"
+                        btnDisable={isUploadingMcq}
+                        clickFunction={() => mcqFileInputRef.current?.click()}
+                    />
                     <ButtonComponent type="button" buttonName="Create Campaign" className="btn btn-primary" clickFunction={() => dispatch(updateOverallModalData({ size: 'md', from: 'admin', type: 'create_campaign', data: { company_flag: selectedCompanyFlag } }))} />
                 </div>
             </div>

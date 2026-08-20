@@ -10,6 +10,11 @@ import InterviewCandidatesHome from "Views/InterviewCandidates/Docs/InterviewCan
 import InterviewCandidatesAuth from "Views/InterviewCandidates/Docs/InterviewCandidatesAuth";
 import ProgrammingAssessment from "Views/InterviewCandidates/Docs/ProgrammingAssessment";
 import ProgrammingAssessmentPreparation from "Views/InterviewCandidates/Docs/ProgrammingAssessmentPreparation";
+import QAAssessmentPreparation from "Views/InterviewCandidates/Docs/QAAssessmentPreparation";
+import QAAssessment from "Views/InterviewCandidates/Docs/QAAssessment";
+import CandidateJourneyCompleted from "Views/InterviewCandidates/Docs/CandidateJourneyCompleted";
+import CandidateStageRoute from "Views/InterviewCandidates/Docs/CandidateStageRoute";
+import { CANDIDATE_STAGES } from "Views/InterviewCandidates/candidateStageRoutes";
 import AdminAuth from "Views/Admin/Docs/AdminAuth";
 import Layout from "Views/Admin/Layout/Layout";
 import Campaign from 'Views/Admin/Docs/Campaign/Campaign';
@@ -34,9 +39,54 @@ const App = () => {
 
           {/* interview candidates Views */}
           <Route path="candidates_home" element={<InterviewCandidatesAuth />}>
-            <Route index element={<InterviewCandidatesHome />} />
-            <Route path="programming-preparation" element={<ProgrammingAssessmentPreparation />} />
-            <Route path="programming-assessment" element={<ProgrammingAssessment />} />
+            <Route
+              index
+              element={
+                <CandidateStageRoute allowedStages={[CANDIDATE_STAGES.MCQ]}>
+                  <InterviewCandidatesHome />
+                </CandidateStageRoute>
+              }
+            />
+            <Route
+              path="programming-preparation"
+              element={
+                <CandidateStageRoute allowedStages={[CANDIDATE_STAGES.PROGRAMMING_PREPARATION]}>
+                  <ProgrammingAssessmentPreparation />
+                </CandidateStageRoute>
+              }
+            />
+            <Route
+              path="programming-assessment"
+              element={
+                <CandidateStageRoute allowedStages={[CANDIDATE_STAGES.PROGRAMMING_ASSESSMENT]}>
+                  <ProgrammingAssessment />
+                </CandidateStageRoute>
+              }
+            />
+            <Route
+              path="programming-preparation-qa"
+              element={
+                <CandidateStageRoute allowedStages={[CANDIDATE_STAGES.QA_PREPARATION]}>
+                  <QAAssessmentPreparation />
+                </CandidateStageRoute>
+              }
+            />
+            <Route
+              path="qa-assessment"
+              element={
+                <CandidateStageRoute allowedStages={[CANDIDATE_STAGES.QA_ASSESSMENT]}>
+                  <QAAssessment />
+                </CandidateStageRoute>
+              }
+            />
+            <Route
+              path="completed"
+              element={
+                <CandidateStageRoute allowedStages={[CANDIDATE_STAGES.COMPLETED]}>
+                  <CandidateJourneyCompleted />
+                </CandidateStageRoute>
+              }
+            />
           </Route>
 
           {/* Admin view */}

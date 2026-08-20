@@ -133,7 +133,18 @@ const CampaignCandidatesCard = ({
         return scored;
     }
 
-    const showTimer = data?.status !== "Test Completed" && timeLeft !== "Test time is over" && data?.status !== "malpractice";
+    function programming_grade_label(grade) {
+        if (grade === "Worst") return "Progressing";
+        if (grade === "Better") return "Good";
+        if (grade === "Good") return "Excelent";
+
+        return grade;
+    }
+
+    const activeEvaluationStatuses = ["Pending", "Queued", "Processing", "In Progress"];
+
+    const isQaFlow = data?.assessment_flow === 'qa';
+    const showTimer = !isQaFlow && data?.status !== "Test Completed" && timeLeft !== "Test time is over" && data?.status !== "malpractice";
     const scoreValue = test_score(data?.test_score);
     const programmingStatus = data?.programming_assessment?.status;
     const programmingEvaluation = data?.programming_assessment?.ai_evaluation || {};
@@ -142,8 +153,21 @@ const CampaignCandidatesCard = ({
     const showProgrammingStatus = programmingStatus && programmingStatus !== "Not Started";
     const showProgrammingTimer = programmingStatus === "In Progress" && programmingTimeLeft && programmingTimeLeft !== "Test time is over";
     const showProgrammingResult = programmingStatus === "Completed" || programmingEvaluation?.status === "Completed";
-    const programmingGradeValue = programmingGrade || (programmingEvaluation?.status === "Pending" ? "Pending" : "-");
+    const programmingGradeValue = programmingGrade ? programming_grade_label(programmingGrade) : (activeEvaluationStatuses.includes(programmingEvaluation?.status) ? "Pending" : "-");
     const programmingScoreValue = programmingScore !== null && programmingScore !== undefined ? `${programmingScore}/100` : null;
+    const qaAssessment = data?.qa_assessment || {};
+    const qaStatus = qaAssessment?.status;
+    const qaEvaluation = qaAssessment?.ai_evaluation || {};
+    const showQaStatus = isQaFlow && qaStatus && qaStatus !== "Not Started";
+    const showQaResult = isQaFlow && (qaStatus === "Completed" || qaEvaluation?.status === "Completed");
+    const qaGradeValue = qaEvaluation?.grade ? programming_grade_label(qaEvaluation.grade) : (
+        activeEvaluationStatuses.includes(qaEvaluation?.status)
+            ? "Pending"
+            : "-"
+    );
+    const qaScoreValue = qaEvaluation?.score !== null && qaEvaluation?.score !== undefined
+        ? `${qaEvaluation.score}/100`
+        : null;
     const activeTimers = [
         showTimer ? {
             label: "MCQ Assessment",
@@ -207,13 +231,27 @@ const CampaignCandidatesCard = ({
             <Card.Header className='border-0 px-3 px-xl-4 pt-3 pb-3 position-relative' style={headerStyles}>
                 <div className="d-flex justify-content-between align-items-start gap-2 mb-2">
                     <div className="d-flex flex-wrap gap-2">
-                        <div className={`interview_candidate_badge ${apti_status_colors(data?.status || '')}`}>
-                            {apti_status(data?.status || '')}
-                        </div>
+                        {!isQaFlow && (
+                            <div className={`interview_candidate_badge ${apti_status_colors(data?.status || '')}`}>
+                                {apti_status(data?.status || '')}
+                            </div>
+                        )}
+
+                        {isQaFlow && (
+                            <div className='interview_candidate_badge test_progress_badge'>
+                                QA Flow
+                            </div>
+                        )}
 
                         {showProgrammingStatus && (
                             <div className={`interview_candidate_badge ${programming_status_colors(programmingStatus)}`}>
                                 Programming: {programmingStatus}
+                            </div>
+                        )}
+
+                        {showQaStatus && (
+                            <div className={`interview_candidate_badge ${programming_status_colors(qaStatus)}`}>
+                                QA: {qaStatus}
                             </div>
                         )}
                     </div>
@@ -286,10 +324,21 @@ const CampaignCandidatesCard = ({
                             </div>
                         ) : (
                             <div className='campaign-candidate-card__score-panel d-grid gap-2'>
-                                <div>
-                                    <div className='campaign-candidate-card__eyebrow'>MCQ Score</div>
-                                    <div className='campaign-candidate-card__score-value'>{scoreValue}</div>
-                                </div>
+                                {!isQaFlow && (
+                                    <div>
+                                        <div className='campaign-candidate-card__eyebrow'>MCQ Score</div>
+                                        <div className='campaign-candidate-card__score-value'>{scoreValue}</div>
+                                    </div>
+                                )}
+
+                                {isQaFlow && !showProgrammingResult && (
+                                    <div>
+                                        <div className='campaign-candidate-card__eyebrow'>Current Stage</div>
+                                        <div className='campaign-candidate-card__status-value text-capitalize'>
+                                            {(data?.current_stage || 'Programming preparation').replace(/_/g, ' ')}
+                                        </div>
+                                    </div>
+                                )}
 
                                 {showProgrammingResult && (
                                     <div className='pt-2 border-top'>
@@ -303,8 +352,24 @@ const CampaignCandidatesCard = ({
                                     </div>
                                 )}
 
+                                {showQaResult && (
+                                    <div className='pt-2 border-top'>
+                                        <div className='campaign-candidate-card__eyebrow'>QA Assessment Grade</div>
+                                        <div className='campaign-candidate-card__status-value'>{qaGradeValue}</div>
+                                        {qaEvaluation?.status === "Completed" && qaScoreValue && (
+                                            <div className='campaign-candidate-card__status-note'>
+                                                Score: {qaScoreValue}
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
                                 <div className='campaign-candidate-card__status-note'>
-                                    {data?.status === "malpractice" ? 'Candidate flagged during assessment' : 'Assessment closed'}
+                                    {data?.status === "malpractice"
+                                        ? 'Candidate flagged during assessment'
+                                        : isQaFlow && !showProgrammingResult
+                                            ? 'Programming assessment is the first round'
+                                            : 'Assessment closed'}
                                 </div>
                             </div>
                         )}
@@ -313,7 +378,7 @@ const CampaignCandidatesCard = ({
             </Card.Header>
 
             <Card.Body className='px-3 px-xl-4 pt-3 pb-0'>
-                {detail_view && data?.test_score && (
+                {detail_view && !isQaFlow && data?.test_score && (
                     <div className='campaign-candidate-card__section mb-3'>
                         <div className='d-flex justify-content-between align-items-center gap-2 mb-3'>
                             <h6 className='mb-0 fw-semibold text-dark'>Marks scored</h6>

@@ -14,7 +14,7 @@ const Login = () => {
               <div className="text-center mb-3">
                 <Img
                   src={Image.AppliedLogo}
-                  alt="modelrocket-logo"
+                  alt="Applied logo"
                   width="150rem"
                   height="28rem"
                 />

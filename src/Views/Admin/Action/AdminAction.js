@@ -11,6 +11,7 @@ import {
 
 } from 'Views/Admin/Slice/AdminSlice';
 import { handleValidation } from 'Views/Common/Action/Common_action';
+import { updateToast } from 'Views/Common/Slice/Common_slice';
 
 export const handleCreateCampaignOnChnage = (ipData) => dispatch => {
     dispatch(update_create_campaign_data(ipData))
@@ -107,6 +108,38 @@ export const handleGetQuestionTypes = () => async (dispatch) => {
     }
     catch (Err) {
         dispatch(getCampaignAssignedQuestions({ type: "failure", message: Err?.message }))
+    }
+}
+
+// Upload MCQ questions from a CSV file
+export const handleUploadMcqQuestions = (file) => async (dispatch) => {
+    if (!file) return false;
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+        const { data } = await axiosInstance.post('/upload_csv_questions', formData);
+
+        if (data?.error_code === 0) {
+            dispatch(updateToast({
+                message: data?.message || 'MCQ questions uploaded successfully',
+                type: 'success'
+            }));
+            return true;
+        }
+
+        dispatch(updateToast({
+            message: data?.message || 'Unable to upload MCQ questions',
+            type: 'error'
+        }));
+        return false;
+    } catch (err) {
+        dispatch(updateToast({
+            message: err?.message || 'Unable to upload MCQ questions',
+            type: 'error'
+        }));
+        return false;
     }
 }
 

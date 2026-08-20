@@ -5,16 +5,19 @@ import React, { Fragment, useEffect } from 'react'
 import { useParams } from 'react-router-dom';
 import useCommonState, { useCustomNavigate, useDispatch } from 'ResuableFunctions/CustomHooks'
 import { handleGetIndividualCampaign, handleGetQuestionTypes } from 'Views/Admin/Action/AdminAction';
+import { ASSESSMENT_FLOWS, getAssessmentFlowLabel } from 'Utils/assessmentFlow';
 
 const Campaign_detail = () => {
     const { campaign_id } = useParams();
     const dispatch = useDispatch();
     const navigate = useCustomNavigate();
     const { adminState } = useCommonState();
+    const assessmentFlow = adminState?.campaigns_data?.assessment_flow || adminState?.campaigns_data?.next_assessment_type;
+    const isQaFlow = assessmentFlow === ASSESSMENT_FLOWS.QA;
 
     useEffect(() => {
         dispatch(handleGetIndividualCampaign({ campaign_id }))
-    }, [])
+    }, [campaign_id])
 
     return (
         <Fragment>
@@ -22,16 +25,29 @@ const Campaign_detail = () => {
                 <div className="w-70">
                     <ButtonComponent type="button" buttonName="Back" className="btn btn-outline-secondary mb-2" clickFunction={() => navigate("/dashboard/interview")} />
                     <h6 className='mb-0 mt-2'>{adminState?.campaigns_data?.job_title || ''} campaign</h6>
+                    {assessmentFlow ? (
+                        <small className='text-secondary d-block mt-2'>
+                            {getAssessmentFlowLabel(assessmentFlow)}
+                        </small>
+                    ) : null}
                 </div>
 
                 <div className="flex-grow-1 text-end">
                     <div className="w-100 h-100 d-flex justify-content-end align-items-center">
-                        <div className="px-2">
-                            <ButtonComponent type="button" buttonName="Generate Sample Test" className="btn btn-outline-primary" clickFunction={() => navigate(`/dashboard/interview/${campaign_id}/generate_sample_test`)} btnDisable={!adminState?.campaigns_data?.question_pattern?.length} />
-                        </div>
-                        <div className="px-2">
-                            <ButtonComponent type="button" buttonName="Generate Questions" className="btn btn-outline-primary" clickFunction={() => dispatch(handleGetQuestionTypes())} />
-                        </div>
+                        {isQaFlow ? (
+                            <span className='badge text-bg-light border px-3 py-2'>
+                                No MCQ round for this flow
+                            </span>
+                        ) : (
+                            <>
+                                <div className="px-2">
+                                    <ButtonComponent type="button" buttonName="Generate Sample Test" className="btn btn-outline-primary" clickFunction={() => navigate(`/dashboard/interview/${campaign_id}/generate_sample_test`)} btnDisable={!adminState?.campaigns_data?.question_pattern?.length} />
+                                </div>
+                                <div className="px-2">
+                                    <ButtonComponent type="button" buttonName="Generate Questions" className="btn btn-outline-primary" clickFunction={() => dispatch(handleGetQuestionTypes())} />
+                                </div>
+                            </>
+                        )}
                     </div>
                 </div>
             </div>

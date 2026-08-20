@@ -1,4 +1,3 @@
-
 const AppliedLogo = require('Assets/Images/Applied-logo.png');
 const CompanyLogo = require('Assets/Images/company_logo.png');
 const CampainEmpty = require('Assets/Images/Task_empty.png');

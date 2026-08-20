@@ -6,9 +6,15 @@ import InterviewCandidatesHeader from 'Components/Panel_compnent/InterviewCandid
 import SpinnerComponent from 'Components/Spinner/Spinner';
 import Icons from 'Utils/Icons';
 import useCommonState, { useDispatch } from 'ResuableFunctions/CustomHooks';
-import { handleCloseProgrammingTestMalpractice, handleEvaluateProgrammingTest, handleStartProgrammingTest, handleSubmitProgrammingTest, handleUpdateMalpractice } from 'Views/InterviewCandidates/Action/interviewAction';
+import { handleCloseProgrammingTestMalpractice, handleGetCandidateCurrentStage, handleStartProgrammingTest, handleSubmitProgrammingTest, handleUpdateMalpractice } from 'Views/InterviewCandidates/Action/interviewAction';
 import { updateProgrammingTestRemainingSeconds } from 'Views/InterviewCandidates/Slice/interviewSlice';
 import { updateOverallModalData } from 'Views/Common/Slice/Common_slice';
+import { CANDIDATE_STAGES } from 'Views/InterviewCandidates/candidateStageRoutes';
+import {
+    deleteProgrammingAssessmentDraft,
+    getProgrammingAssessmentDraft,
+    saveProgrammingAssessmentDraft
+} from 'Views/InterviewCandidates/programmingAssessmentDraftDb';
 
 const programmingLanguages = [
     { label: 'JavaScript', value: 'javascript' },
@@ -16,6 +22,26 @@ const programmingLanguages = [
     { label: 'Java', value: 'java' },
     { label: 'Python', value: 'python' }
 ];
+
+const buildServerAnswers = (submissions) => (
+    (submissions || []).reduce((serverAnswers, submission) => {
+        if (submission?.question_id !== undefined) {
+            serverAnswers[submission.question_id] = typeof submission?.candidate_answer === 'string'
+                ? submission.candidate_answer
+                : '';
+        }
+        return serverAnswers;
+    }, {})
+);
+
+const normalizeDraftAnswers = (draftAnswers, questions) => (
+    (questions || []).reduce((normalizedAnswers, question, index) => {
+        const questionKey = question?.id ?? index;
+        const answer = draftAnswers?.[questionKey];
+        if (typeof answer === 'string') normalizedAnswers[questionKey] = answer;
+        return normalizedAnswers;
+    }, {})
+);
 
 const ProgrammingAssessment = () => {
     const { interviewState, commonState } = useCommonState();
@@ -25,50 +51,45 @@ const ProgrammingAssessment = () => {
     const isRequestInProgress = programmingTest?.start_spinner || programmingTest?.submit_spinner;
     const isMalpracticeStatus = programmingTest?.status === "Malpractice";
     const hasSubmitted = programmingTest?.submit_status === "Completed" || programmingTest?.status === "Completed" || isMalpracticeStatus;
+    const continuesToQaAssessment = (
+        programmingTest?.assessment_flow === 'qa' &&
+        programmingTest?.next_stage === CANDIDATE_STAGES.QA_PREPARATION
+    );
     const autoSubmittedRef = useRef(false);
     const completionModalShownRef = useRef(false);
-    const backgroundEvaluationStartedRef = useRef(false);
     const malpracticeTriggeredRef = useRef(false);
 
     const [selectedQuestionIndex, setSelectedQuestionIndex] = useState(0);
     const [answers, setAnswers] = useState({});
     const [selectedLanguage, setSelectedLanguage] = useState(programmingLanguages[0]);
+    const [draftReady, setDraftReady] = useState(false);
     const [showConfirmation, setShowConfirmation] = useState(false);
 
     const selectedQuestion = useMemo(
         () => programmingQuestions[selectedQuestionIndex] || programmingQuestions[0] || {},
         [programmingQuestions, selectedQuestionIndex]
     );
-    const selectedAnswer = answers[selectedQuestion?.id] || '';
+    const selectedQuestionKey = selectedQuestion?.id ?? selectedQuestionIndex;
+    const selectedAnswer = answers[selectedQuestionKey] || '';
     const secondsLeft = programmingTest?.remaining_seconds ?? programmingTest?.duration ?? 300;
+    const isLastQuestion = programmingQuestions.length > 0 && selectedQuestionIndex === programmingQuestions.length - 1;
 
     const getSubmissionPayload = useCallback((submitReason = "manual") => {
-        let questionToSubmit = selectedQuestion;
-        let answerToSubmit = selectedAnswer;
-
-        if (["timeout", "malpractice"].includes(submitReason) && !answerToSubmit) {
-            const firstAnsweredQuestion = programmingQuestions.find((question) => answers[question.id]);
-
-            if (firstAnsweredQuestion) {
-                questionToSubmit = firstAnsweredQuestion;
-                answerToSubmit = answers[firstAnsweredQuestion.id] || '';
-            }
-        }
-
         return {
-            selected_question: {
-                title: questionToSubmit?.title || '',
-                description: questionToSubmit?.description || ''
-            },
             selected_language: selectedLanguage?.value || '',
-            candidate_answer: ["timeout", "malpractice"].includes(submitReason) ? answerToSubmit : answerToSubmit.trim()
+            submit_reason: submitReason,
+            submissions: programmingQuestions.map((question, index) => ({
+                question_id: question?.id ?? index + 1,
+                title: question?.title || '',
+                description: question?.description || '',
+                sample: question?.sample || '',
+                candidate_answer: answers[question?.id ?? index] || ''
+            }))
         };
     }, [
         answers,
         programmingQuestions,
-        selectedAnswer,
-        selectedLanguage?.value,
-        selectedQuestion
+        selectedLanguage?.value
     ]);
 
     const formattedTime = useMemo(() => {
@@ -78,12 +99,21 @@ const ProgrammingAssessment = () => {
         return `${minutes} : ${seconds}`;
     }, [secondsLeft]);
 
-    const submitProgrammingAnswer = useCallback((submitReason = "manual") => {
+    const submitProgrammingAnswer = useCallback(async (submitReason = "manual") => {
         if (programmingTest?.submit_spinner || hasSubmitted) return;
 
         setShowConfirmation(false);
 
-        dispatch(handleSubmitProgrammingTest(getSubmissionPayload(submitReason)));
+        const response = await dispatch(
+            handleSubmitProgrammingTest(getSubmissionPayload(submitReason))
+        );
+
+        if (
+            response?.assessment_flow === 'qa' &&
+            response?.next_stage === CANDIDATE_STAGES.QA_PREPARATION
+        ) {
+            await dispatch(handleGetCandidateCurrentStage());
+        }
     }, [
         dispatch,
         getSubmissionPayload,
@@ -150,7 +180,84 @@ const ProgrammingAssessment = () => {
 
     useEffect(() => {
         dispatch(handleStartProgrammingTest());
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    useEffect(() => {
+        if (!programmingTest?.assessment_id || !programmingQuestions.length) return;
+
+        let isCancelled = false;
+        setDraftReady(false);
+
+        const hydrateDraft = async () => {
+            const serverAnswers = buildServerAnswers(programmingTest?.submissions);
+
+            try {
+                const draft = await getProgrammingAssessmentDraft(programmingTest.assessment_id);
+                if (isCancelled) return;
+
+                setAnswers({
+                    ...serverAnswers,
+                    ...normalizeDraftAnswers(draft?.answers, programmingQuestions)
+                });
+
+                const restoredLanguage = programmingLanguages.find((language) => (
+                    language.label === draft?.selected_language?.label &&
+                    language.value === draft?.selected_language?.value
+                ));
+                setSelectedLanguage(restoredLanguage || programmingLanguages[0]);
+
+                const restoredQuestionIndex = Number(draft?.selected_question_index);
+                setSelectedQuestionIndex(
+                    Number.isInteger(restoredQuestionIndex)
+                        ? Math.max(0, Math.min(restoredQuestionIndex, programmingQuestions.length - 1))
+                        : 0
+                );
+            } catch (error) {
+                if (!isCancelled) {
+                    setAnswers(serverAnswers);
+                    setSelectedLanguage(programmingLanguages[0]);
+                    setSelectedQuestionIndex(0);
+                }
+                console.error('Unable to restore programming assessment draft:', error);
+            } finally {
+                if (!isCancelled) setDraftReady(true);
+            }
+        };
+
+        hydrateDraft();
+        return () => {
+            isCancelled = true;
+        };
+    }, [
+        programmingQuestions,
+        programmingTest?.assessment_id,
+        programmingTest?.submissions
+    ]);
+
+    useEffect(() => {
+        if (!draftReady || !programmingTest?.assessment_id || hasSubmitted) return;
+
+        const saveTimer = window.setTimeout(() => {
+            saveProgrammingAssessmentDraft({
+                assessmentId: programmingTest.assessment_id,
+                answers,
+                selectedLanguage,
+                selectedQuestionIndex
+            }).catch((error) => {
+                console.error('Unable to save programming assessment draft:', error);
+            });
+        }, 500);
+
+        return () => window.clearTimeout(saveTimer);
+    }, [
+        answers,
+        draftReady,
+        hasSubmitted,
+        programmingTest?.assessment_id,
+        selectedLanguage,
+        selectedQuestionIndex
+    ]);
 
     useEffect(() => {
         if (!programmingTest?.test_started_on || hasSubmitted) return;
@@ -186,12 +293,19 @@ const ProgrammingAssessment = () => {
         if (hasSubmitted) {
             dispatch(updateProgrammingTestRemainingSeconds(0));
             autoSubmittedRef.current = true;
+
+            if (programmingTest?.assessment_id) {
+                deleteProgrammingAssessmentDraft(programmingTest.assessment_id).catch((error) => {
+                    console.error('Unable to remove submitted programming assessment draft:', error);
+                });
+            }
         }
-    }, [hasSubmitted]);
+    }, [hasSubmitted, programmingTest?.assessment_id]);
 
     useEffect(() => {
         if (!hasSubmitted) return;
         if (isMalpracticeStatus || commonState?.test_over_logout === 'malpracticed_again') return;
+        if (continuesToQaAssessment) return;
 
         if (!completionModalShownRef.current) {
             completionModalShownRef.current = true;
@@ -203,20 +317,11 @@ const ProgrammingAssessment = () => {
             }));
         }
 
-        if (
-            programmingTest?.evaluation_status === "Pending" &&
-            !programmingTest?.evaluate_spinner &&
-            !backgroundEvaluationStartedRef.current
-        ) {
-            backgroundEvaluationStartedRef.current = true;
-            dispatch(handleEvaluateProgrammingTest({ silent: true }));
-        }
     }, [
         commonState?.test_over_logout,
+        continuesToQaAssessment,
         hasSubmitted,
-        isMalpracticeStatus,
-        programmingTest?.evaluate_spinner,
-        programmingTest?.evaluation_status
+        isMalpracticeStatus
     ]);
 
     const handleAnswerChange = (value) => {
@@ -224,12 +329,18 @@ const ProgrammingAssessment = () => {
 
         setAnswers((currentAnswers) => ({
             ...currentAnswers,
-            [selectedQuestion.id]: value || ''
+            [selectedQuestionKey]: value || ''
         }));
     };
 
     const handleManualSubmit = () => {
         submitProgrammingAnswer("manual");
+    };
+
+    const handleQuestionNavigation = (questionIndex) => {
+        if (isRequestInProgress || hasSubmitted) return;
+        if (!programmingQuestions.length) return;
+        setSelectedQuestionIndex(Math.max(0, Math.min(questionIndex, programmingQuestions.length - 1)));
     };
 
     return (
@@ -246,10 +357,10 @@ const ProgrammingAssessment = () => {
                                 {programmingQuestions.map((question, questionInd) => (
                                     <button
                                         type='button'
-                                        className={`programming-question-list__item ${questionInd === selectedQuestionIndex ? 'active' : ''} ${answers[question.id] ? 'answered' : ''}`}
-                                        onClick={() => setSelectedQuestionIndex(questionInd)}
+                                        className={`programming-question-list__item ${questionInd === selectedQuestionIndex ? 'active' : ''} ${(answers[question.id ?? questionInd] || '').trim() ? 'answered' : ''}`}
+                                        onClick={() => handleQuestionNavigation(questionInd)}
                                         disabled={isRequestInProgress || hasSubmitted}
-                                        key={question.id}
+                                        key={question.id ?? questionInd}
                                     >
                                         <span>{questionInd + 1}</span>
                                         <strong>{question.title}</strong>
@@ -339,13 +450,31 @@ const ProgrammingAssessment = () => {
                                     </div>
                                 </div>
                             </Card.Body>
-                            <Card.Footer className='py-4 bg-transparent border-0 d-flex justify-content-end'>
-                                <ButtonComponent
-                                    className='btn-brand px-5'
-                                    buttonName={programmingTest?.submit_spinner ? <SpinnerComponent /> : 'Submit Answer'}
-                                    clickFunction={() => setShowConfirmation(true)}
-                                    btnDisable={!selectedQuestion?.id || !selectedAnswer.trim() || isRequestInProgress || hasSubmitted}
-                                />
+                            <Card.Footer className='py-4 bg-transparent border-0 d-flex flex-wrap'>
+                                <div className='col'>
+                                    <ButtonComponent
+                                        className='btn-brand px-5'
+                                        buttonName='Previous'
+                                        clickFunction={() => handleQuestionNavigation(selectedQuestionIndex - 1)}
+                                        btnDisable={selectedQuestionIndex === 0 || isRequestInProgress || hasSubmitted}
+                                    />
+                                </div>
+                                <div className='col text-end'>
+                                    <ButtonComponent
+                                        className='btn-brand px-5'
+                                        buttonName={
+                                            isLastQuestion
+                                                ? (programmingTest?.submit_spinner ? <SpinnerComponent /> : 'Submit Test')
+                                                : 'Next'
+                                        }
+                                        clickFunction={
+                                            isLastQuestion
+                                                ? () => setShowConfirmation(true)
+                                                : () => handleQuestionNavigation(selectedQuestionIndex + 1)
+                                        }
+                                        btnDisable={!selectedQuestion?.id || isRequestInProgress || hasSubmitted}
+                                    />
+                                </div>
                             </Card.Footer>
                         </Card>
                     </div>
@@ -361,14 +490,14 @@ const ProgrammingAssessment = () => {
             >
                 <Modal.Header closeButton={!isRequestInProgress} className='border-0'>
                     <Modal.Title>
-                        <h6 className='mb-0'>Submit Answer</h6>
+                        <h6 className='mb-0'>Submit Test</h6>
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body className='px-4'>
                     <div className='text-center py-4'>
                         {Icons?.closeTestIcon}
-                        <h5 className='my-3'>Are you sure you want to submit this answer?</h5>
-                        <p className='text-secondary mb-0'>Your answer will be saved before evaluation begins.</p>
+                        <h5 className='my-3'>Are you sure you want to submit this test?</h5>
+                        <p className='text-secondary mb-0'>All 8 questions will be submitted, including unanswered questions.</p>
                     </div>
                 </Modal.Body>
                 <Modal.Footer className='border-0'>
@@ -384,7 +513,7 @@ const ProgrammingAssessment = () => {
                         <div className='col-6 p-1 pb-0'>
                             <ButtonComponent
                                 className='btn-brand w-100 py-2'
-                                buttonName={programmingTest?.submit_spinner ? <SpinnerComponent /> : 'Submit Answer'}
+                                buttonName={programmingTest?.submit_spinner ? <SpinnerComponent /> : 'Submit Test'}
                                 clickFunction={handleManualSubmit}
                                 btnDisable={isRequestInProgress || hasSubmitted}
                             />
