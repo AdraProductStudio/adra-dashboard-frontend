@@ -66,21 +66,35 @@ export const handleBearerToken = (token) => dispatch => {
     dispatch(updateToken(token))
 }
 
-export const handleLogout = () => dispatch => {
-    dispatch(logout())
+export const handleLogout = () => async (dispatch) => {
+    try {
+        window.sessionStorage.setItem("manualLogout", "true");
+        await axiosInstance.post("/logout", {}, { _skipAuthRefresh: true })
+    } catch (err) {
+        console.error("Logout request failed:", err);
+    } finally {
+        dispatch(logout())
+    }
 }
 
 //refresh token
 export const handlerefreshToken = () => async (dispatch) => {
     try {
-        const { data } = await axiosInstance.get("/refresh_token")
-        if (data?.error_code === 200) {
-            dispatch(updateToken(data?.data?.access_token))
+        const { data } = await axiosInstance.post("/refresh_token", {}, { _skipAuthRefresh: true })
+        const token = data?.data?.token;
+
+        if (data?.error_code === 0 && token) {
+            dispatch(updateToken(token))
+            return token;
         } else {
             dispatch(updateRemoveToken())
+            throw new Error(data?.message || "Session expired. Please login again.")
         }
     } catch (err) {
         dispatch(updateToast({ message: err?.message, type: "error" }))
+        dispatch(updateRemoveToken())
+        if (window.location.pathname !== "/") window.location.replace("/");
+        throw err;
     }
 }
 

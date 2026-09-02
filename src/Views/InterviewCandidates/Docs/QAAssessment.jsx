@@ -137,7 +137,7 @@ const QAAssessment = () => {
 
     useEffect(() => {
         dispatch(handleStartQaTest());
-    }, [dispatch]);
+    }, []);
 
     useEffect(() => {
         if (!qaTest?.assessment_id || !questions.length) return;
@@ -315,7 +315,6 @@ const QAAssessment = () => {
     }, [
         commonState?.involved_in_tab_switching,
         commonState?.test_over_logout,
-        dispatch,
         hasSubmitted,
         qaTest?.submit_spinner,
         submitAssessment
@@ -345,7 +344,6 @@ const QAAssessment = () => {
         const timer = window.setInterval(updateTimer, 1000);
         return () => window.clearInterval(timer);
     }, [
-        dispatch,
         hasSubmitted,
         qaTest?.server_time,
         qaTest?.test_ends_on,
@@ -379,7 +377,6 @@ const QAAssessment = () => {
         }
     }, [
         continuesToProgrammingAssessment,
-        dispatch,
         hasSubmitted,
         qaTest?.assessment_id,
         qaTest?.status
