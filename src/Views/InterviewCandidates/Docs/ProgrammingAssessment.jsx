@@ -173,7 +173,6 @@ const ProgrammingAssessment = () => {
     }, [
         commonState?.involved_in_tab_switching,
         commonState?.test_over_logout,
-        dispatch,
         getSubmissionPayload,
         hasSubmitted,
         programmingTest?.submit_spinner
@@ -284,7 +283,6 @@ const ProgrammingAssessment = () => {
 
         return () => clearInterval(timer);
     }, [
-        dispatch,
         hasSubmitted,
         programmingTest?.duration,
         programmingTest?.test_started_on,
@@ -302,7 +300,7 @@ const ProgrammingAssessment = () => {
                 });
             }
         }
-    }, [dispatch, hasSubmitted, programmingTest?.assessment_id]);
+    }, [hasSubmitted, programmingTest?.assessment_id]);
 
     useEffect(() => {
         if (!hasSubmitted) return;

@@ -48,7 +48,6 @@ const AssessmentPreparation = ({ assessmentName }) => {
 
         return () => clearInterval(timer);
     }, [
-        dispatch,
         journey.preparation_ends_at,
         serverOffset
     ]);

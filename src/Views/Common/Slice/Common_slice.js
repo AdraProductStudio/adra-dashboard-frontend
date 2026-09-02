@@ -142,18 +142,19 @@ const commonSlice = createSlice({
         updateRemoveToken(state) {
             let decrypt_cookie = Cookies.get('log') ? decryptData(Cookies.get('log')) : {};
             delete decrypt_cookie.token;
+            delete decrypt_cookie.user_role;
             Cookies.set('log', encryptData(decrypt_cookie));
 
             state.token = '';
+            state.user_role = '';
         },
         logout(state) {
-            let decrypt_cookie = Cookies.get('log') ? decryptData(Cookies.get('log')) : {};
-            delete decrypt_cookie.token;
-            delete decrypt_cookie.user_id;
-            Cookies.set('log', encryptData(decrypt_cookie));
+            Cookies.remove('log');
 
             Object.assign(state, {
                 token: '',
+                user_role: '',
+                user_id: '',
                 usernamee: '',
                 passwordd: '',
             });

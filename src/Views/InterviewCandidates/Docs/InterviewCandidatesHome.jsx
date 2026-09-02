@@ -76,7 +76,7 @@ const InterviewCandidatesHome = () => {
             document.removeEventListener("visibilitychange", handleVisibilityChange);
             window.removeEventListener("blur", handleBlur);
         };
-    }, [commonState?.involved_in_tab_switching, commonState?.test_over_logout, interviewState?.isDataPresentInIndexedDb, dispatch]);
+    }, [commonState?.involved_in_tab_switching, commonState?.test_over_logout, interviewState?.isDataPresentInIndexedDb]);
 
     useEffect(() => {
         initializeDB(process.env.REACT_APP_INDEXEDDB_DATABASE_NAME, process.env.REACT_APP_INDEXEDDB_DATABASE_VERSION, process.env.REACT_APP_INDEXEDDB_DATABASE_STORENAME)
@@ -143,7 +143,7 @@ const InterviewCandidatesHome = () => {
 
             return () => clearInterval(timer);
         }
-    }, [interviewState?.test_end_timeStamp, commonState?.involved_in_tab_switching, commonState?.test_over_logout, dispatch, navigate])
+    }, [interviewState?.test_end_timeStamp, commonState?.involved_in_tab_switching, commonState?.test_over_logout, navigate])
 
     return (
         <div className='overflow-hidden applied_brand_color '>

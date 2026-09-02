@@ -13,8 +13,8 @@ const Layout = () => {
     const dispatch = useDispatch();
     const navigate = useCustomNavigate();
 
-    const logoutFunction = () => {
-        dispatch(handleLogout());
+    const logoutFunction = async () => {
+        await dispatch(handleLogout());
         navigate("/", { replace: true });
     }
 

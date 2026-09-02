@@ -37,7 +37,7 @@ export const InitializeProjectSetup = () => {
             })
             return
         }
-    }, [commonState?.Toast_Type, commonState?.Err, dispatch])
+    }, [commonState?.Toast_Type, commonState?.Err])
 
     // Current page name handler
     useEffect(() => {
