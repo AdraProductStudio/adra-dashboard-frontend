@@ -6,6 +6,7 @@ import { PiClockCountdown } from "react-icons/pi";
 import { useDispatch } from 'ResuableFunctions/CustomHooks';
 import Icons from 'Utils/Icons';
 import { updateOverallModalData } from 'Views/Common/Slice/Common_slice';
+import CandidateResumeCard from 'Components/Resume/CandidateResumeCard';
 
 const CampaignCandidatesCard = ({
     data, clickFunction,
@@ -452,6 +453,7 @@ const CampaignCandidatesCard = ({
                                 </div>
                             ))}
                         </div>
+                        <CandidateResumeCard candidate={data} className="mt-3" />
                     </div>
                 )}
             </Card.Footer>

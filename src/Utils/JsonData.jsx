@@ -59,11 +59,7 @@ const JsonData = () => {
             //     name: "Dashboard",
             //     route: "/dashboard/home"
             // },
-            // {
-            //     icon: Icons?.employeeIcon,
-            //     name: "Employees",
-            //     route: "/dashboard/employees"
-            // },
+
             // {
             //     icon: Icons.attendanceIcon,
             //     name: "Attendance",
@@ -79,6 +75,11 @@ const JsonData = () => {
                 name: "Interview",
                 route: "/dashboard/interview"
             },
+            //             {
+            //     icon: Icons?.employeeIcon,
+            //     name: "Employees",
+            //     route: "/dashboard/employees"
+            // },
             // {
             //     icon: Icons.circularIcon,
             //     name: "Circular",
@@ -579,6 +580,22 @@ const JsonData = () => {
                 },
                 isMandatory: true,
                 Err: commonState?.validated && !interviewState?.candidateData?.expectedSalary ? "Expected Salary required" : null
+            },
+            {
+                category: "heading",
+                title: "Upload Your Updated Resume",
+                divClassName: 'col-12 p-1 mt-2',
+            },
+            {
+                name: "Resume (PDF, max 5 MB)",
+                category: "resume_upload",
+                divClassName: 'col-12 p-1 mt-2 mb-2',
+                value: interviewState?.candidateData?.resume,
+                change: (file) => dispatch(handleInterviewRegistrationOnChange({ resume: file })),
+                remove: () => dispatch(handleInterviewRegistrationOnChange({ resume: undefined })),
+                onError: (message) => dispatch(updateToast({ type: "error", message })),
+                isMandatory: false,
+                Err: commonState?.validated && !interviewState?.candidateData?.resume ? "Resume required" : null
             },
 
             //                                                                      Remarks                                                                      //

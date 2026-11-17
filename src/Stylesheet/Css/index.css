@@ -2287,3 +2287,55 @@
     grid-template-columns: 1fr;
   }
 }
+
+
+/* ---------- Resume upload (registration) + resume card (admin) ---------- */
+.resume-upload__dropzone {
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+  padding: 1.5rem 1rem; border: 2px dashed #c9d3df; border-radius: 14px;
+  background: linear-gradient(180deg, #fbfcfe 0%, #f3f6fa 100%);
+  cursor: pointer; transition: border-color .2s, background .2s, transform .2s;
+}
+.resume-upload__dropzone:hover, .resume-upload__dropzone:focus-visible { border-color: #111; outline: none; background: #fff; }
+.resume-upload__dropzone.is-dragging { border-color: #111; background: #eef2f7; transform: scale(1.01); }
+.resume-upload__dropzone.has-error { border-color: #dc3545; background: #fff7f7; }
+.resume-upload__icon {
+  width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center;
+  background: #111; color: #fff; margin-bottom: .6rem; box-shadow: 0 6px 16px rgba(0,0,0,.18);
+}
+.resume-upload__title { margin: 0; font-size: .95rem; color: #1f2933; }
+.resume-upload__title span { font-weight: 600; text-decoration: underline; }
+.resume-upload__hint { margin: .25rem 0 0; font-size: .8rem; color: #7b8794; }
+.resume-upload__file, .resume-card__file {
+  display: flex; align-items: center; gap: .85rem; width: 100%;
+  padding: .8rem 1rem; border: 1px solid #e1e7ef; border-radius: 14px; background: #fff;
+  box-shadow: 0 2px 10px rgba(15,23,42,.05); text-align: left;
+}
+.resume-upload__pdf-badge {
+  flex: 0 0 44px; height: 44px; border-radius: 12px; display: grid; place-items: center;
+  background: #fdecea; color: #d93025;
+}
+.resume-upload__file-info, .resume-card__file-info { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.resume-upload__file-name { margin: 0; font-weight: 600; font-size: .92rem; color: #1f2933; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; }
+.resume-upload__file-meta { margin: 0; font-size: .78rem; color: #7b8794; display: block; }
+.resume-upload__ok { color: #1e9e57; vertical-align: -2px; }
+.resume-upload__btn-link { border: 0; background: none; font-size: .85rem; font-weight: 600; text-decoration: underline; color: #111; }
+.resume-upload__remove { border: 0; background: #f1f3f6; border-radius: 50%; width: 32px; height: 32px; display: grid; place-items: center; color: #52606d; }
+.resume-upload__remove:hover { background: #fdecea; color: #d93025; }
+.resume-upload__error { margin-top: .5rem; font-size: .85rem; color: #dc3545; display: flex; align-items: center; gap: .35rem; }
+
+.resume-card { background: #fff; border: 1px solid #e1e7ef; border-radius: 16px; padding: 1rem 1.1rem; box-shadow: 0 2px 10px rgba(15,23,42,.04); }
+.resume-card__eyebrow { font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; color: #7b8794; margin-bottom: .6rem; font-weight: 600; }
+.resume-card__body { display: flex; flex-wrap: wrap; gap: .75rem; align-items: center; }
+.resume-card__file { flex: 1 1 260px; width: auto; cursor: pointer; box-shadow: none; background: #fafbfd; }
+.resume-card__file:hover:not(:disabled) { border-color: #111; background: #fff; }
+.resume-card__actions { display: flex; gap: .5rem; }
+.resume-card__btn { display: inline-flex; align-items: center; gap: .35rem; padding: .5rem .9rem; border-radius: 10px; border: 1px solid #111; background: #fff; color: #111; font-size: .88rem; font-weight: 600; }
+.resume-card__btn--primary { background: #111; color: #fff; }
+.resume-card__btn:disabled { opacity: .6; cursor: progress; }
+.resume-card__empty { color: #7b8794; font-size: .9rem; }
+
+/* Resume view inside the narrow "Additional details" card: keep file row and buttons tidy */
+.campaign-candidate-card__section .resume-card__file { flex-basis: 100%; }
+.campaign-candidate-card__section .resume-card__actions { width: 100%; }
+.campaign-candidate-card__section .resume-card__btn { flex: 1; justify-content: center; }

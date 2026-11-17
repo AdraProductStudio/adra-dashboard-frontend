@@ -202,6 +202,36 @@ export const handleGetIndividualCampaignCandidate = (params) => async (dispatch)
     }
 }
 
+// Opens the candidate's resume (stored in MongoDB) in a new tab, or downloads it.
+// The API returns the PDF as base64 inside the normal JSON envelope; it is turned into a Blob here.
+// The tab is opened synchronously on click, otherwise browsers block it as a pop-up after the await.
+export const handleOpenCandidateResume = ({ candidate_id, download = false }) => async (dispatch) => {
+    try {
+        const { data } = await axiosInstance.get(`/candidate_resume/${candidate_id}`);
+
+        if (data?.error_code !== 0 || !data?.data?.content_base64) {
+            return dispatch(updateToast({ message: data?.message || "Unable to open resume", type: "error" }));
+        }
+
+        const binary = atob(data.data.content_base64);
+        const bytes = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+        const blobUrl = URL.createObjectURL(new Blob([bytes], { type: 'application/pdf' }));
+
+        if (download) {
+            const link = document.createElement('a');
+            link.href = blobUrl;
+            link.download = data.data.file_name || 'resume.pdf';
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            setTimeout(() => URL.revokeObjectURL(blobUrl), 60 * 1000);
+        } else window.location.assign(blobUrl); // View: open the PDF in this same tab (no new tab / extra click)
+    } catch (Err) {
+        dispatch(updateToast({ message: Err?.message || "Unable to open resume", type: "error" }));
+    }
+}
+
 export const handleGetFellowshipCandidates = (params) => async (dispatch) => {
     try {
         dispatch(getFellowshipCandidates({ type: "request", page_number: params?.page }))

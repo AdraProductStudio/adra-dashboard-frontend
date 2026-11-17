@@ -65,7 +65,10 @@ export const handleRegisterCandidate = ({ candidateRegistration, input_data }, n
     }
 
     Object.keys(params).forEach((key) => {
-        if (key === 'image') fd.append(key, params[key][0]);
+        if (key === 'resume') {
+            if (params[key] instanceof File) fd.append(key, params[key]);
+        }
+        else if (key === 'image') fd.append(key, params[key][0]);
         else fd.append(key, params[key]);
     })
 
