@@ -24,6 +24,8 @@ import FellowshipCandidatesRegistration from "Views/Common/Docs/FellowshipCandid
 import Fellowship from "Views/Admin/Docs/Fellowship";
 import FellowshipDetails from "Views/Admin/Docs/Fellowship/details";
 import Sample_test from "Views/Admin/Docs/Campaign/Sample_test";
+import Employees from "Views/Admin/Docs/Employees";
+import EmployeeDetails from "Views/Admin/Docs/Employees/details";
 
 
 const App = () => {
@@ -96,6 +98,11 @@ const App = () => {
               <Route path="employees" element={<p>employees</p>} />
               <Route path="attendance" element={<p>attendance</p>} />
               <Route path="payroll" element={<p>payroll</p>} /> */}
+
+              <Route path="employees">
+                <Route index element={<Employees />} />
+                <Route path=":employee_id" element={<EmployeeDetails />} />
+              </Route>
 
               <Route path="interview">
                 <Route index element={<Campaign />} />

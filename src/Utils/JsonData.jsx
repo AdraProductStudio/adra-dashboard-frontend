@@ -75,11 +75,11 @@ const JsonData = () => {
                 name: "Interview",
                 route: "/dashboard/interview"
             },
-            //             {
-            //     icon: Icons?.employeeIcon,
-            //     name: "Employees",
-            //     route: "/dashboard/employees"
-            // },
+                        {
+                icon: Icons?.employeeIcon,
+                name: "Employees",
+                route: "/dashboard/employees"
+            },
             // {
             //     icon: Icons.circularIcon,
             //     name: "Circular",

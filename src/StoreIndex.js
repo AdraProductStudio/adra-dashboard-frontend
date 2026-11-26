@@ -3,11 +3,13 @@ import { thunk } from "redux-thunk"
 import commonReducer from 'Views/Common/Slice/Common_slice';
 import interviewReducer from "Views/InterviewCandidates/Slice/interviewSlice";
 import adminReducer from 'Views/Admin/Slice/AdminSlice';
+import employeeReducer from 'Views/Admin/Slice/EmployeeSlice';
 
 const reducers = combineReducers({
     commonState: commonReducer,
     interviewState: interviewReducer,
-    adminState: adminReducer
+    adminState: adminReducer,
+    employeeState: employeeReducer
 })
 
 const store = configureStore({
